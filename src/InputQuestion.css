@@ -1,0 +1,17 @@
+.buttons {
+    position: absolute;
+    display: block;
+    right: 3.5%;
+}
+
+.add-box {
+    height: 4rem;
+}
+
+.submit-buttons {
+    position: absolute;
+    display: block;
+    right: 3.5%;
+    margin-top: 1rem;
+}
+

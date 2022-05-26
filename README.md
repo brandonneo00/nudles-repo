@@ -1,32 +1,15 @@
-###
-(Template)
-What should be including in your README file?
+# NUdleS
+## **Re-defining your study experience with a slurp of NUdleS**
+<img src="src/images/nudles-logo.PNG" alt="drawing" width="200"/>
 
-1. Your level of achievement, 
-2. Project scope (one sentence version and a longer descriptive version), as well as
-3. Milestone 1 (Ideation): 
-    - include problem motivation, 
-    - proposed core features / user stories, 
-    - design and plan
+**Please refer to the following link for our 
+[Project Log](https://docs.google.com/document/d/1W8_kbOFGnF6ezP0ctnlpxP9E9SrikQOpkPSTeVOh9VA/edit?usp=sharing)**
 
-4. Milestone 2 (Prototype): 
-    - include core features developed, 
-    - problems encountered
+## **Level of Achievement:** Apollo11
 
-5. Milestone 3 (Extension): 
-    - include bugs squashed, 
-    - edge features developed, 
-    - problems encountered, and
-    - user testing
-
-
-Draft:
-
-Level of Achievement: Apollo11
-
+---
 
 Project Scope (one sentence version): Adopting the concept of Wordle and taking it to another level (Trivia Game + Resource Library)
-
 
 Project Scope (longer descriptive version): 
 Innovative game that adopts the concept of Wordle to entice students to revise on a consistent basis. 
@@ -39,6 +22,7 @@ Additional functionalities include:
     -> words are not limited to just 5 letters
     -> explanation to the question will be provided at the end (explanation is provided by the professors/TAs when they create the NUdleS themselves)
 
+---
 
 Problem Motivation:
 - Many students often procrastinate and leave revision till the very last minute, which usually results in a less than ideal performance during exams
@@ -46,6 +30,7 @@ Problem Motivation:
 - Som
 - Some students also find it mundane and difficult to motivate themselves to revise for exams
 
+---
 
 Proposed Core Feautres:
 - Student Login Authentication, Admin Login Authentication, Forget Password & Change Password, Create Account
@@ -54,6 +39,8 @@ Proposed Core Feautres:
 - Side-Bar navigation (drawer feature) that routes users to different features/pages of the webapp e.g. Module Search, Daily NUdleS, Resource Library, Leaderboard, Input Question
 - The center NUdleS logo on the top navigation bar acts as a HomeButton routes users back to the WelcomePage
 - Logout Button situated at the top right on the navigation bar logs the user out and routes him/her back to the homepage/login page
+
+<br />
 
 (Work-in-progress Features)
 - Leaderboard feature allowing users to search the module of interest and display the top scorers
@@ -64,6 +51,7 @@ Proposed Core Feautres:
     - pop-up window that includes the question, answer, explanation to the daily NUdleS after user has attempted
 - Resource Library for users to search and download the module materials/resources
 
+---
 
 Proposed User Stories: 
 - As a student who finds revision boring and tiring, I want to have the element of fun while studying to make the process more enjoyable
@@ -72,13 +60,11 @@ Proposed User Stories:
 - As a professor/teaching assistant, I want my students to learn and be better engaged with the module resources
 - As a professor/teaching assistant, I want to inject the element of fun into my students revision to make studying less mundane/boring
 
+---
 
 Proposed Design and Plan: 
 Tech Stack --> ReactJS (JSXML), CSS, HTML, Firebase, ChakraUI, NodeJS
 - wireframing, UI/UX design on Figma, incorporating colour theory, font matching, etc
 - making use of 3rd party libraries such as ChakraUI/MaterialUI for frontend design, react-router-dom for routing between pages
 - Using firebase as backend
-
-###
-
 

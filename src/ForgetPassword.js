@@ -1,4 +1,4 @@
-import TopBarV2 from "./components/TopBarV2";
+import TopBar from "./components/TopBar";
 import logo from "./images/nudles-logo.PNG";
 import {
   Center,
@@ -14,7 +14,7 @@ import { Formik, Field } from "formik";
 function ForgetPassword() {
   return (
     <>
-      <TopBarV2></TopBarV2>
+      <TopBar></TopBar>
       <div>
         <header className="logo-header">
           <img src={logo} className="welcome-logo" alt="nudles_logo" />

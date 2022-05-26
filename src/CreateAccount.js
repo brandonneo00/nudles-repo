@@ -1,4 +1,4 @@
-import TopBarV2 from "./components/TopBarV2";
+import TopBar from "./components/TopBar";
 import { Formik, Field } from "formik";
 import { Input, Box, VStack, HStack, Checkbox, Text } from "@chakra-ui/react";
 import logo from "./images/nudles-logo.PNG";
@@ -13,7 +13,7 @@ import {
 function CreateAccount() {
   return (
     <>
-      <TopBarV2></TopBarV2>
+      <TopBar></TopBar>
       <div>
         <header className="logo-header">
           <img src={logo} className="welcome-logo" alt="nudles_logo" />

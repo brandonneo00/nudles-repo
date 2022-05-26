@@ -1,70 +1,84 @@
-# Getting Started with Create React App
+###
+(Template)
+What should be including in your README file?
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Your level of achievement, 
+2. Project scope (one sentence version and a longer descriptive version), as well as
+3. Milestone 1 (Ideation): 
+    - include problem motivation, 
+    - proposed core features / user stories, 
+    - design and plan
 
-## Available Scripts
+4. Milestone 2 (Prototype): 
+    - include core features developed, 
+    - problems encountered
 
-In the project directory, you can run:
+5. Milestone 3 (Extension): 
+    - include bugs squashed, 
+    - edge features developed, 
+    - problems encountered, and
+    - user testing
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Draft:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Level of Achievement: Apollo11
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Project Scope (one sentence version): Adopting the concept of Wordle and taking it to another level (Trivia Game + Resource Library)
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Project Scope (longer descriptive version): 
+Innovative game that adopts the concept of Wordle to entice students to revise on a consistent basis. 
+Additional functionalities include:
+- a resource library/question bank that helps to compile the entire semester's "NUdleS" to provide students with the convenience of having seamless access to study materials. 
+- a leaderboard feature to further gamify the webapp and encourage friendly competition 
+- motivational quote of the day (that changes every login) at the welcome page to motivate studentsduring the semester for better user experience
+- tool for professors and teaching assistants to curate NUdleS for the modules that they are teaching for students to play based on the teaching objects for the day/week/lecture/tutorial/etc and also enables them to keep track of students' understanding of teaching content
+- what sets us apart from a typical Wordle is that:
+    -> words are not limited to just 5 letters
+    -> explanation to the question will be provided at the end (explanation is provided by the professors/TAs when they create the NUdleS themselves)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Problem Motivation:
+- Many students often procrastinate and leave revision till the very last minute, which usually results in a less than ideal performance during exams
+- Many students also lack the time and resources to compile and make their own revision materials due to their hectic schedule and/or overwhelming workload
+- Som
+- Some students also find it mundane and difficult to motivate themselves to revise for exams
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Proposed Core Feautres:
+- Student Login Authentication, Admin Login Authentication, Forget Password & Change Password, Create Account
+- Welcome Page with a daily motivational quote (fetched from an online open source API)
+- Input Question Page which allow admin (professors/teaching assistants) to upload the question bank (which includes question, answer and explanation)
+- Side-Bar navigation (drawer feature) that routes users to different features/pages of the webapp e.g. Module Search, Daily NUdleS, Resource Library, Leaderboard, Input Question
+- The center NUdleS logo on the top navigation bar acts as a HomeButton routes users back to the WelcomePage
+- Logout Button situated at the top right on the navigation bar logs the user out and routes him/her back to the homepage/login page
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+(Work-in-progress Features)
+- Leaderboard feature allowing users to search the module of interest and display the top scorers
+- Extended Welcome page that shows the user the modules that he/she has "favourite-d" based on the modules that he/she is taking during the semester
+- User interface to play NUdleS with 
+    - color-coded keyboard that greys out incorrectly guessed letters
+    - color-coded grid/text to notify users regarding their attempt (Green - correct letter in correct position, Yellow - correct letter but in wrong position, Grey - wrong letter)
+    - pop-up window that includes the question, answer, explanation to the daily NUdleS after user has attempted
+- Resource Library for users to search and download the module materials/resources
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Proposed User Stories: 
+- As a student who finds revision boring and tiring, I want to have the element of fun while studying to make the process more enjoyable
+- As a student with a small social circle, I have trouble obtaining module resources (past year practices, notes, etc) which my peers have access to
+- As a student with a tightly packed schedule and many commitments outside of academics, it is difficult to set aside ample amount of time for revision each week, causing my workload to pile-up, it would be great if I could revise on the go
+- As a professor/teaching assistant, I want my students to learn and be better engaged with the module resources
+- As a professor/teaching assistant, I want to inject the element of fun into my students revision to make studying less mundane/boring
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Proposed Design and Plan: 
+Tech Stack --> ReactJS (JSXML), CSS, HTML, Firebase, ChakraUI, NodeJS
+- wireframing, UI/UX design on Figma, incorporating colour theory, font matching, etc
+- making use of 3rd party libraries such as ChakraUI/MaterialUI for frontend design, react-router-dom for routing between pages
+- Using firebase as backend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+###
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

@@ -1,130 +1,98 @@
 import TopBar from "./components/TopBar";
 import { Formik, Field } from "formik";
-import { Input, Box, VStack, HStack, Checkbox, Text } from "@chakra-ui/react";
 import logo from "./images/nudles-logo.PNG";
 import {
   FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
   Center,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Input,
+  Box,
+  VStack,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import { useSignup } from "./hooks/useSignup";
 
 function CreateAccount() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmpassword, setConfirmPassword] = useState("");
+  const { error, signup } = useSignup();
+  const [finalerror, setFinalError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFinalError(null);
+    if (password !== confirmpassword) {
+      console.log("password mismatch!");
+      setFinalError("Password mismatch!");
+    } else {
+      signup(email, password);
+    }
+  };
+
   return (
     <>
       <TopBar></TopBar>
+
       <div>
         <header className="logo-header">
           <img src={logo} className="welcome-logo" alt="nudles_logo" />
         </header>
       </div>
-
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-          rememberMe: false,
-        }}
-        onSubmit={(values) => {
-          alert(JSON.stringify(values, null, 2));
-        }}
-      >
-        {({ handleSubmit, errors, touched }) => (
-          <form onSubmit={handleSubmit}>
-            <VStack spacing={4} align="flex-start" alignItems="center">
-              <HStack>
-                <FormControl>
-                  <Field
-                    as={Input}
-                    id="email"
-                    name="email"
-                    type="email"
-                    variant="filled"
-                    placeholder="Email Address"
-                  />
-                </FormControl>
-
-                <FormControl>
-                  <Field
-                    as={Input}
-                    id="username"
-                    name="username"
-                    type="username"
-                    variant="filled"
-                    placeholder="Username"
-                  />
-                </FormControl>
-              </HStack>
-
-              <HStack>
-                <FormControl isInvalid={!!errors.password && touched.password}>
-                  <Field
-                    as={Input}
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    variant="filled"
-                    validate={(value) => {
-                      let error;
-
-                      if (value.length < 5) {
-                        error = "Password must contain at least 6 characters";
-                      }
-
-                      return error;
-                    }}
-                  />
-                  <FormErrorMessage>{errors.password}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.password && touched.password}>
-                  <Field
-                    as={Input}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="confirmPassword"
-                    placeholder="Confirm Password"
-                    variant="filled"
-                    validate={(value) => {
-                      let error;
-
-                      if (value.length < 5) {
-                        error = "Password must contain at least 6 characters";
-                      }
-
-                      return error;
-                    }}
-                  />
-                  <FormErrorMessage>{errors.password}</FormErrorMessage>
-                </FormControl>
-              </HStack>
-              <HStack>
+      <Formik>
+        <form onSubmit={handleSubmit}>
+          <VStack spacing={4} align="flex-start" alignItems="center">
+            <Box width="444px">
+              <FormControl isRequired>
                 <Field
-                  as={Checkbox}
-                  id="applyAccount"
-                  name="applyAccount"
-                  colorScheme="orange"
-                >
-                  <Text width="193px" fontSize="sm" noOfLines={2}>
-                    {" "}
-                    <strong>Apply for Admin Account</strong> (Only for
-                    Professors/TA)
-                  </Text>
-                </Field>
+                  as={Input}
+                  id="email"
+                  name="email"
+                  type="email"
+                  variant="filled"
+                  placeholder="Email Address"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                />
+              </FormControl>
+            </Box>
 
-                <FormControl>
-                  <Field
-                    as={Input}
-                    id="nusnetID"
-                    name="nusnetID"
-                    variant="filled"
-                    placeholder="NUSNET ID"
-                  />
-                </FormControl>
-              </HStack>
-            </VStack>
+            <Box width="444px">
+              <FormControl isRequired>
+                <Field
+                  as={Input}
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  variant="filled"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                />
+              </FormControl>
+            </Box>
+
+            <Box width="444px">
+              <FormControl
+                isRequired
+                isInvalid={!(password === confirmpassword)}
+              >
+                <Field
+                  as={Input}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm Password"
+                  variant="filled"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={confirmpassword}
+                />
+              </FormControl>
+            </Box>
+
             <Center>
               <Box
                 as="button"
@@ -154,8 +122,25 @@ function CreateAccount() {
                 Create Account
               </Box>
             </Center>
-          </form>
-        )}
+            <Box width="444px">
+              {(finalerror || error) && (
+                <Alert
+                  status="error"
+                  alignItems="center"
+                  justifyContent="center"
+                  textAlign="center"
+                  marginTop="0.5rem"
+                >
+                  <AlertIcon />
+                  <AlertTitle>Error: </AlertTitle>
+                  <AlertDescription>
+                    {finalerror === null ? error : finalerror}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </Box>
+          </VStack>
+        </form>
       </Formik>
     </>
   );

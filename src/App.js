@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
-import { Switch, Route } from "react-router-dom";
-//import { Routes, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { useAuthContext } from "./hooks/useAuthContext";
 
 import Welcome from "./Welcome";
 import Homepage from "./Homepage";
@@ -14,47 +14,64 @@ import InputQuestion from "./InputQuestion";
 import Leaderboard from "./Leaderboard";
 import AdminLogin from "./AdminLogin";
 import ChangePassword from "./ChangePassword";
+import UpdateProfile from "./UpdateProfile";
 
 function App() {
+  const { user, authIsReady } = useAuthContext();
   return (
     <>
       <div>
-      
-      {/*<Routes>*/}
-      <Switch>
-          <Route exact path="/"> <Homepage /></Route>
-          <Route exact path="/Welcome"> <Welcome /></Route>
-          <Route exact path="/CreateAccount"> <CreateAccount/></Route>
-          <Route exact path="/ForgetPassword"><ForgetPassword/></Route>
-          <Route exact path="/Search"><Search/></Route>
-          <Route exact path="/Play"><Play/></Route>
-          <Route exact path="/ResourceLibrary"><ResourceLibrary/></Route>
-          <Route exact path="/InputQuestion"><InputQuestion/></Route>
-          <Route exact path="/Leaderboard"><Leaderboard/></Route>
-          <Route exact path="/AdminLogin"><AdminLogin/></Route>
-          <Route exact path="/ChangePassword"><ChangePassword/></Route>
-      </Switch>
-{/*}
-          
-          <Route path="/" element={<Homepage />}></Route>
-          <Route exact path="/Welcome" element={<Welcome />}></Route>
-          <Route exact path="/CreateAccount" element={<CreateAccount/>}></Route>
-          <Route exact path="/ForgetPassword" element={<ForgetPassword/>}></Route>
-          <Route exact path="/Search" element={<Search/>}></Route>
-          <Route exact path="/Play" element={<Play/>}></Route>
-          <Route exact path="/ResourceLibrary" element={<ResourceLibrary/>}></Route>
-          <Route exact path="/InputQuestion" element={<InputQuestion/>}></Route>
-          <Route exact path="/Leaderboard" element={<Leaderboard/>}></Route>
-          <Route exact path="/AdminLogin" element={<AdminLogin/>}></Route>
-
-        */}
-          
-
-          {/*</Routes><Route path="/InputQn" element={<InputQn/>}</Route> */}
-      
+        {authIsReady && (
+          <Switch>
+            <Route exact path="/">
+              {!user && <Homepage />}
+              {user && <Redirect to="/Welcome" />}
+            </Route>
+            <Route exact path="/Welcome">
+              {user && <Welcome />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/CreateAccount">
+              {!user && <CreateAccount />}
+              {user && <Redirect to="/UpdateProfile" />}
+            </Route>
+            <Route exact path="/ForgetPassword">
+              <ForgetPassword />
+            </Route>
+            <Route exact path="/Search">
+              {user && <Search />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/Play">
+              {user && <Play />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/ResourceLibrary">
+              {user && <ResourceLibrary />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/InputQuestion">
+              {user && <InputQuestion />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/Leaderboard">
+              {user && <Leaderboard />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/AdminLogin">
+              {!user && <AdminLogin />}
+              {user && <Redirect to="/Welcome" />}
+            </Route>
+            <Route exact path="/ChangePassword">
+              <ChangePassword />
+            </Route>
+            <Route exact path="/UpdateProfile">
+              {user && <UpdateProfile />}
+              {!user && <Redirect to="/" />}
+            </Route>
+          </Switch>
+        )}
       </div>
-
-      {/*<Routes/>*/}
     </>
   );
 }

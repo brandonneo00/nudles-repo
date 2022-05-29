@@ -4,27 +4,13 @@ import input from "../../images/pencil.png";
 import folder from "../../images/folder-grey.png";
 import leaderboard from "../../images/bar-chart-grey.png";
 import menu from "../../images/menu.png";
-import { Link } from "react-router-dom";
-import { Routes, Route } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-
-import Welcome from "../../Welcome";
-import Homepage from "../../Homepage";
-
-import Search from "../../Search";
-import Play from "../../Play";
-import ResourceLibrary from "../../ResourceLibrary";
-import InputQuestion from "../../InputQuestion";
-import Leaderboard from "../../Leaderboard";
-
 import {
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   Button,
   useDisclosure,
   VStack,
@@ -81,7 +67,7 @@ function LeftDrawer() {
                   transform: "scale(0.98)",
                 }}
               >
-                <NavLink to="Search" activeClassName="active" >
+                <NavLink to="Search" activeClassName="active">
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
@@ -108,8 +94,7 @@ function LeftDrawer() {
                 }}
               >
                 <NavLink to="Play" activeClassName="active">
-                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
-                
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
                       src={play}
@@ -133,8 +118,8 @@ function LeftDrawer() {
                   transform: "scale(0.98)",
                 }}
               >
-                <NavLink to="ResourceLibrary" activeClassName="active" >
-                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
+                <NavLink to="ResourceLibrary" activeClassName="active">
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
                       src={folder}
@@ -158,8 +143,8 @@ function LeftDrawer() {
                   transform: "scale(0.98)",
                 }}
               >
-                <NavLink to="Leaderboard" activeClassName="active" >
-                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
+                <NavLink to="Leaderboard" activeClassName="active">
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
                       src={leaderboard}
@@ -183,8 +168,8 @@ function LeftDrawer() {
                   transform: "scale(0.98)",
                 }}
               >
-                <NavLink to="InputQuestion" activeClassName="active" >
-                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
+                <NavLink to="InputQuestion" activeClassName="active">
+                  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
                       src={input}

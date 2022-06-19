@@ -1,0 +1,4 @@
+{
+    "debug.openDebug": "openOnDebugBreak",
+    "debug.javascript.automaticallyTunnelRemoteServer": false
+}

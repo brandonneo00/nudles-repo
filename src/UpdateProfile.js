@@ -27,6 +27,7 @@ function UpdateProfile() {
   const [checkbox, setCheckBox] = useState("");
   const [_username, setUsername] = useState("");
   const [_nusnetid, setNusNetID] = useState("");
+  const [moduleList, setModuleList] = useState([]); // to include new field called moduleList
   const { user } = useAuthContext();
   const history = useHistory();
 
@@ -39,6 +40,7 @@ function UpdateProfile() {
       username: _username,
       nusnet: _nusnetid,
       uid: user.uid,
+      moduleList: moduleList
     });
     setCheckBox("");
     setUsername("");

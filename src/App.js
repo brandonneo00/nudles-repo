@@ -15,6 +15,7 @@ import Leaderboard from "./Leaderboard";
 import AdminLogin from "./AdminLogin";
 import ChangePassword from "./ChangePassword";
 import UpdateProfile from "./UpdateProfile";
+import ModuleSelection from "./ModuleSelection";
 
 function App() {
   const { user, authIsReady } = useAuthContext();
@@ -67,6 +68,10 @@ function App() {
             </Route>
             <Route exact path="/UpdateProfile">
               {user && <UpdateProfile />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/ModuleSelection">
+              {user && <ModuleSelection />}
               {!user && <Redirect to="/" />}
             </Route>
           </Switch>

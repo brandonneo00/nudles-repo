@@ -48,7 +48,7 @@ function LeftDrawer() {
           transform: "scale(0.98)",
         }}
       ></Button>
-      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+      <Drawer placement="left" onClose={onClose} isOpen={isOpen} size="xs">
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">
@@ -93,7 +93,7 @@ function LeftDrawer() {
                   transform: "scale(0.98)",
                 }}
               >
-                <NavLink to="Play" activeClassName="active">
+                <NavLink to="ModuleSelection" activeClassName="active">
                   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;
                   <HStack>
                     <Image
@@ -104,7 +104,7 @@ function LeftDrawer() {
                       margin="0px 0px 0px 8px"
                     />
                     <Text fontSize="26px" fontWeight="semibold" color="#686B6F">
-                      DAILY NUDLES
+                      SELECT MODULES
                     </Text>
                   </HStack>
                 </NavLink>

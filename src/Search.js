@@ -18,30 +18,228 @@ import {
   Spacer,
   Flex,
   IconButton,
-  Tooltip
+  Tooltip,
+  Select,
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 // import work from "./images/work-in-progress.png";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useCollection } from "./hooks/useCollection";
+import {
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  getDoc,
+  collectionGroup,
+  setDoc,
+} from "firebase/firestore";
 
-import { collection, addDoc } from "firebase/firestore";
+import { db } from "./firebase/config";
 import "./Search.css";
+import { useAuthContext } from "./hooks/useAuthContext";
+import _ from "lodash";
 
 function Search() {
-  const [searchInput, setSearchInput] = useState("");
+  //for specifying extra fields
+  const [modulecode, setModuleCode] = useState("");
+  const [academicyear, setAcademicYear] = useState("");
+  const [term, setTerm] = useState("");
+  const [error, setError] = useState(null);
+  const [resArray, setResArray] = useState("");
+  const { user } = useAuthContext();
+
+  var helper = [];
+
+  function checkSearchError(acadYear) {
+    if (
+      acadYear.includes("/") ||
+      acadYear.includes(" ") ||
+      !acadYear.includes("-") ||
+      acadYear.length !== 5
+    ) {
+      throw Error(
+        "Academic Year should be in the format 21-22 separated by a dash"
+      );
+    }
+  }
+
+  const handleDelete = async (
+    moduleCode,
+    academicYear,
+    term,
+    creatorUsername,
+    creatorUID
+  ) => {
+    const moduleObj = {
+      modulecode: moduleCode,
+      academicyear: academicYear,
+      term: term,
+      creatorusername: creatorUsername,
+      creatoruid: creatorUID,
+    };
+
+    const docRef = doc(db, "likedmodules", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      var tempArray = docSnap.data().modarray;
+      var newArray = [];
+
+      for (let i = 0; i < tempArray.length; i++) {
+        if (!_.isEqual(tempArray[i], moduleObj)) {
+          newArray.push(tempArray[i]);
+        }
+      }
+      await setDoc(docRef, { modarray: newArray });
+    }
+  };
+
+  const handleAdd = async (
+    moduleCode,
+    academicYear,
+    term,
+    creatorUsername,
+    creatorUID
+  ) => {
+    const moduleObj = {
+      modulecode: moduleCode,
+      academicyear: academicYear,
+      term: term,
+      creatorusername: creatorUsername,
+      creatoruid: creatorUID,
+    };
+
+    //Get modArray data from the likedmodules collection
+    const docRef = doc(db, "likedmodules", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      console.log("Document data:", docSnap.data());
+      var tempArray = docSnap.data().modarray;
+
+      let allDifferent = true;
+      // check if moduleObj exists in the modarray field
+      for (let i = 0; i < tempArray.length; i++) {
+        if (_.isEqual(tempArray[i], moduleObj)) {
+          console.log("inside same");
+          allDifferent = false;
+          break;
+        }
+      }
+      console.log("this is temp array " + tempArray);
+      // push moduleObj into the temparray
+      if (allDifferent) {
+        tempArray.push(moduleObj);
+        console.log("this is after pushing into temp array " + tempArray);
+      }
+      // updating the modarray field of the doc
+      await setDoc(docRef, { modarray: tempArray });
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+      // set the modarray field if the field is empty
+      await setDoc(docRef, { modarray: [moduleObj] });
+    }
+    //If empty/not inside then we add
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("hello");
+    setResArray("");
+
+    try {
+      checkSearchError(academicyear);
+      console.log("i am sleepy and i want a nap");
+      //creating reference to the questions collection in our firestore database
+      const qnRef = collection(db, "questions");
+      console.log("3.05pm");
+      //creating query against the collection
+
+      const _q = query(
+        qnRef,
+        where("module", "==", modulecode.toUpperCase()),
+        where("academicyear", "==", academicyear),
+        where("term", "==", term)
+      );
+      // executing the query
+      const qn_querySnapshot = await getDocs(_q);
+      var uniqueSet = new Set();
+
+      console.log("been here before uuuuuu");
+
+      qn_querySnapshot.forEach((docs) => {
+        console.log("it is almost dinner time");
+        console.log(docs.id, " => ", docs.data());
+        console.log("time to go kith");
+
+        if (!uniqueSet.has(docs.data().uid)) {
+          uniqueSet.add(docs.data().uid);
+
+          const userRef = collection(db, "userprofiles");
+
+          const queryUserRef = query(
+            userRef,
+            where("uid", "==", docs.data().uid)
+          );
+
+          let nameHolder;
+          const snapShot1 = async () => {
+            const qUserRef = await getDocs(queryUserRef);
+            qUserRef.forEach((file) => (nameHolder = file.data().username));
+            console.log("this " + nameHolder);
+
+            helper.push({
+              modcode: docs.data().module,
+              createdby: nameHolder,
+              ay: docs.data().academicyear,
+              term: docs.data().term,
+              creatoruid: docs.data().uid,
+            });
+
+            setResArray(helper);
+          };
+
+          snapShot1();
+        }
+      });
+
+      setModuleCode("");
+      setAcademicYear("");
+      setTerm("");
+    } catch (e) {
+      setError(e);
+      console.error(e);
+    }
   };
-  const searchResult = {
-    moduleCode: "MA2001",
-    moduleName:"Fundamentals of Econometrics",
-    createdBy:"Dr Nudles Admin",
-    ay: "21/22",
-    term:"Special Term 1"
-  };
+
+  function formatYear(acadyear) {
+    return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
+  }
+
+  function ModuleNameAPI(props) {
+    const nusmodsAPI =
+      "https://api.nusmods.com/v2/" +
+      formatYear(props.ay) +
+      "/modules/" +
+      props.mc +
+      ".json";
+    const [moduleName, setModuleName] = useState("");
+    useEffect(() => {
+      fetch(nusmodsAPI)
+        .then((response) => response.json())
+        .then((data) => setModuleName(data.title))
+        .catch((error) =>
+          setModuleName(`Unable to retrieve Module Name: ${error}`)
+        );
+    }, []);
+
+    return moduleName;
+  }
+
   return (
     <div>
       <TopBarV2 />
@@ -70,9 +268,50 @@ function Search() {
                   width="9vw"
                   height="1.875vw"
                   placeholder="E.g. CS1101S"
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  value={searchInput}
+                  onChange={(e) => setModuleCode(e.target.value)}
+                  value={modulecode.toUpperCase()}
                 />
+
+                <Box>
+                  <Text
+                    fontSize="1.5vw"
+                    fontWeight="semibold"
+                    color="#000000"
+                    lineHeight="1.3"
+                    align="left"
+                  >
+                    Academic Year
+                  </Text>
+                </Box>
+                <Field
+                  as={Input}
+                  id="modulecode"
+                  name="academic year"
+                  variant="filled"
+                  // width="8.5rem"
+                  width="9vw"
+                  height="1.875vw"
+                  placeholder="Academic Year"
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  value={academicyear}
+                />
+
+                <Select
+                  variant="filled"
+                  placeholder="Term"
+                  width="8.333vw"
+                  onChange={(e) => setTerm(e.target.value)}
+                  value={term}
+                  height="2vw"
+                  fontSize="1.2vw"
+                  iconSize="1vw"
+                  // textColor="#8891A4"
+                >
+                  <option>Semester 1</option>
+                  <option>Semester 2</option>
+                  <option>Special Term 1</option>
+                  <option>Special Term 2</option>
+                </Select>
 
                 <Box
                   // className="buttons"
@@ -111,9 +350,8 @@ function Search() {
 
       <Grid minHeight="40vw">
         <GridItem bg="#E5E5E5" borderRadius="15px" margin="2%" padding="1.5%">
-          
-          <Flex>
-            <VStack>
+          <Flex marginBottom="1vw">
+            <Box width="12vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -123,24 +361,9 @@ function Search() {
               >
                 MODULE CODE
               </Text>
-              <Tooltip label={searchResult.moduleCode}>
-              <Container
-                // height="2.500vw"
-                width="12vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0"
-              
-              >
-              
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw"> {searchResult.moduleCode}</Text>
-              </Container>
-              </Tooltip>
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="25vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -150,24 +373,9 @@ function Search() {
               >
                 MODULE NAME
               </Text>
-              <Tooltip label={searchResult.moduleName}>
-              <Container
-                // height="2.500vw"
-                width="25vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw" noOfLines={1}>{searchResult.moduleName}</Text>
-                
-              </Container>
-              </Tooltip>
-             
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="20vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -177,22 +385,9 @@ function Search() {
               >
                 CREATED BY
               </Text>
-              <Tooltip label={searchResult.createdBy}>
-              <Container
-                // height="2.500vw"
-                width="20vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw" noOfLines={1}>{searchResult.createdBy}</Text>
-              </Container>
-              </Tooltip>
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="7vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -202,22 +397,9 @@ function Search() {
               >
                 AY
               </Text>
-              <Tooltip label={searchResult.ay}>
-              <Container
-                // height="2.500vw"
-                width="7vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw">{searchResult.ay}</Text>
-              </Container>
-              </Tooltip>
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="15vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -227,22 +409,9 @@ function Search() {
               >
                 TERM
               </Text>
-              <Tooltip label={searchResult.term}>
-              <Container
-                // height="2.500vw"
-                width="15vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw"> {searchResult.term}</Text>
-              </Container>
-              </Tooltip>
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="3.5vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -252,28 +421,9 @@ function Search() {
               >
                 ADD
               </Text>
-              
-              <Button
-                className="add-button"
-                // onClick={() => handleAdd(question.id)}
-                as={IconButton}
-                variant="ghost"
-                icon={<Image src={AddImage} alt="add-logo" boxSize="2.5vw" />}
-                boxSize="2.5vw"
-                borderWidth="0px"
-                bg="#ffffff00"
-                _hover={{ bg: "#ffffff00" }}
-                _active={{
-                  bg: "#ffffff00",
-                  transform: "scale(0.98)",
-                }}
-                padding="0px"
-              ></Button>
-            </VStack>
-
+            </Box>
             <Spacer />
-
-            <VStack>
+            <Box width="6vw">
               <Text
                 fontSize="1.5vw"
                 fontWeight="semibold"
@@ -283,144 +433,182 @@ function Search() {
               >
                 DELETE
               </Text>
-              {/* <Container
-                height="2.500vw"
-                width="2.708vw"
-                borderRadius="15px"
-              ></Container> */}
-              <Button
-                className="delete-button"
-                // onClick={() => handleAdd(question.id)}
-                as={IconButton}
-                variant="ghost"
-                icon={<Image src={Bin} alt="bin-logo" boxSize="2.5vw" />}
-                boxSize="2.5vw"
-                borderWidth="0px"
-                bg="#ffffff00"
-                _hover={{ bg: "#ffffff00" }}
-                _active={{
-                  bg: "#ffffff00",
-                  transform: "scale(0.98)",
-                }}
-                padding="0px"
-              ></Button>
-            </VStack>
+            </Box>
           </Flex>
 
-          {/* <Center>
-            <Box as="table">
-              <VStack spacing="0">
-                <HStack spacing="1rem">
+          {resArray &&
+            resArray.map((element, index) => (
+              <Flex key={index} marginBottom="1vw">
+                <Tooltip label={element.modcode}>
                   <Container
-                    className="container"
-                    width="11.625rem"
-                    marginLeft="0px"
+                    height="4vw"
+                    width="12vw"
+                    borderRadius="10px"
+                    bg="#EDF6F9"
+                    padding="0.9vw 0"
                   >
                     <Text
-                      fontSize="20px"
                       fontWeight="semibold"
-                      color="#000000"
-                      lineHeight="1.3"
-                      align="center"
+                      textAlign="center"
+                      fontSize="1.5vw"
                     >
-                      MODULE CODE
+                      {element.modcode}
                     </Text>
                   </Container>
+                </Tooltip>
 
+                <Spacer />
+
+                <Tooltip
+                  label={
+                    <ModuleNameAPI ay={element.ay} mc={element.modcode}>
+                      {" "}
+                    </ModuleNameAPI>
+                  }
+                >
                   <Container
-                    className="container"
-                    width="23.75rem"
-                    centerContent
-                    marginLeft="0px"
+                    height="4vw"
+                    width="25vw"
+                    borderRadius="10px"
+                    bg="#EDF6F9"
+                    padding="0.9vw 0"
                   >
                     <Text
-                      fontSize="20px"
                       fontWeight="semibold"
-                      color="#000000"
-                      lineHeight="1.3"
-                      align="center"
+                      textAlign="center"
+                      fontSize="1.5vw"
+                      noOfLines={1}
                     >
-                      MODULE NAME
+                      {/* {element.modname} */}
+                      <ModuleNameAPI ay={element.ay} mc={element.modcode}>
+                        {" "}
+                      </ModuleNameAPI>
                     </Text>
                   </Container>
+                </Tooltip>
 
+                <Spacer />
+
+                <Tooltip label={element.createdby}>
                   <Container
-                    className="container"
-                    width="15.25rem"
-                    centerContent
+                    height="4vw"
+                    width="20vw"
+                    borderRadius="10px"
+                    bg="#EDF6F9"
+                    padding="0.9vw 0"
                   >
                     <Text
-                      fontSize="20px"
                       fontWeight="semibold"
-                      color="#000000"
-                      lineHeight="1.3"
-                      align="center"
+                      textAlign="center"
+                      fontSize="1.5vw"
+                      noOfLines={1}
                     >
-                      CREATED BY
+                      {element.createdby}
                     </Text>
                   </Container>
+                </Tooltip>
 
+                <Spacer />
+
+                <Tooltip label={element.ay}>
                   <Container
-                    className="container"
-                    width="7.625rem"
-                    centerContent
+                    height="4vw"
+                    width="7vw"
+                    borderRadius="10px"
+                    bg="#EDF6F9"
+                    padding="0.9vw 0"
                   >
                     <Text
-                      fontSize="20px"
                       fontWeight="semibold"
-                      color="#000000"
-                      lineHeight="1.3"
-                      align="center"
+                      textAlign="center"
+                      fontSize="1.5vw"
                     >
-                      AY
+                      {element.ay}
                     </Text>
                   </Container>
+                </Tooltip>
 
+                <Spacer />
+
+                <Tooltip label={element.term}>
                   <Container
-                    className="container"
-                    width="12.313rem"
-                    centerContent
+                    height="4vw"
+                    width="15vw"
+                    borderRadius="10px"
+                    bg="#EDF6F9"
+                    padding="0.9vw 0"
                   >
                     <Text
-                      fontSize="20px"
                       fontWeight="semibold"
-                      color="#000000"
-                      lineHeight="1.3"
-                      align="center"
+                      textAlign="center"
+                      fontSize="1.5vw"
                     >
-                      TERM
+                      {element.term}
                     </Text>
                   </Container>
+                </Tooltip>
 
-                  <Container
-                    className="container"
-                    width="3.25rem"
-                    centerContent
-                  />
+                <Spacer />
+                <Box width="3.5vw" textAlign="center" padding="0.9vw 0">
+                  <Button
+                    className="add-button"
+                    onClick={() =>
+                      handleAdd(
+                        element.modcode,
+                        element.ay,
+                        element.term,
+                        element.createdby,
+                        element.creatoruid
+                      )
+                    }
+                    as={IconButton}
+                    variant="ghost"
+                    icon={
+                      <Image src={AddImage} alt="add-logo" boxSize="2.5vw" />
+                    }
+                    boxSize="2.5vw"
+                    borderWidth="0px"
+                    bg="#ffffff00"
+                    _hover={{ bg: "#ffffff00" }}
+                    _active={{
+                      bg: "#ffffff00",
+                      transform: "scale(0.98)",
+                    }}
+                    padding="0px"
+                  ></Button>
+                </Box>
 
-                  <Container
-                    className="container"
-                    width="3.25rem"
-                    centerContent
-                  />
-
-                </HStack>
-
-                <Center>{}</Center>
-              </VStack>
-            </Box>
-          </Center> */}
+                <Spacer />
+                <Box width="6vw" textAlign="center" padding="0.8vw 0">
+                  <Button
+                    className="delete-button"
+                    onClick={() =>
+                      handleDelete(
+                        element.modcode,
+                        element.ay,
+                        element.term,
+                        element.createdby,
+                        element.creatoruid
+                      )
+                    }
+                    as={IconButton}
+                    variant="ghost"
+                    icon={<Image src={Bin} alt="bin-logo" boxSize="2.5vw" />}
+                    boxSize="2.5vw"
+                    borderWidth="0px"
+                    bg="#ffffff00"
+                    _hover={{ bg: "#ffffff00" }}
+                    _active={{
+                      bg: "#ffffff00",
+                      transform: "scale(0.98)",
+                    }}
+                    padding="0px"
+                  ></Button>
+                </Box>
+              </Flex>
+            ))}
         </GridItem>
       </Grid>
-
-      {/* <Center bg="#FFFFFF00" height="40rem">
-        <Image boxSize="30rem" src={work} alt="Work-in-progress" />
-      </Center>
-      <Center bg="#FFFFFF00" color="black">
-        <Text fontSize="60px" fontWeight="bold" color="#000000" align="center">
-          (MODULE SEARCH)
-        </Text>
-      </Center> */}
     </div>
   );
 }

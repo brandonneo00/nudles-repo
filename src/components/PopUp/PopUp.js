@@ -41,11 +41,11 @@ function PopUp(props) {
           <ModalHeader>Daily NUdleS</ModalHeader>
           {/* <ModalCloseButton /> */}
           <ModalHeader>Question</ModalHeader>
-          <ModalBody>Input Question Here!</ModalBody>
+          <ModalBody>{props.chosenQuestion.question}</ModalBody>
           <ModalHeader>Answer</ModalHeader>
-          <ModalBody>Input Answer Here!</ModalBody>
+          <ModalBody>{props.chosenQuestion.answer}</ModalBody>
           <ModalHeader>Explanation</ModalHeader>
-          <ModalBody>Input Explanation Here!</ModalBody>
+          <ModalBody>{props.chosenQuestion.explanation}</ModalBody>
           <ModalFooter>
             <Button
               onClick={onClose}

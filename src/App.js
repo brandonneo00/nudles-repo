@@ -16,9 +16,11 @@ import AdminLogin from "./AdminLogin";
 import ChangePassword from "./ChangePassword";
 import UpdateProfile from "./UpdateProfile";
 import ModuleSelection from "./ModuleSelection";
+import CompiledQuestions from "./CompiledQuestions";
 
 function App() {
   const { user, authIsReady } = useAuthContext();
+  // const { a, b } = useRestrict();
   return (
     <>
       <div>
@@ -46,6 +48,10 @@ function App() {
             <Route exact path="/Play">
               {user && <Play />}
               {!user && <Redirect to="/" />}
+              {/* {(fromMS) ?  <Play/> : <Redirect to="/ModuleSelection"/>} */}
+              {/* {fromMS && <Play />}
+              {!fromMS && <Redirect to="/ModuleSelection" />} */}
+
             </Route>
             <Route exact path="/ResourceLibrary">
               {user && <ResourceLibrary />}
@@ -72,6 +78,10 @@ function App() {
             </Route>
             <Route exact path="/ModuleSelection">
               {user && <ModuleSelection />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/CompiledQuestions">
+              {user && <CompiledQuestions />}
               {!user && <Redirect to="/" />}
             </Route>
           </Switch>

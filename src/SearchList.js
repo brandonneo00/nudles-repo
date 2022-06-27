@@ -1,12 +1,20 @@
-// import bin from "./images/bin.png";
-// import add from "./images/add.png";
-// import { Button, Image, Box, IconButton } from "@chakra-ui/react";
+import bin from "./images/bin.png";
+import add from "./images/add.png";
+import { Button, Image, Box, IconButton } from "@chakra-ui/react";
 
-// import { db } from "./firebase/config";
-// import { doc, deleteDoc } from "firebase/firestore"; // for deleting or updating documemts
-// import { collection, addDoc } from "firebase/firestore";
+import { db } from "./firebase/config";
+import { doc, deleteDoc } from "firebase/firestore"; // for deleting or updating documemts
+import { collection, addDoc } from "firebase/firestore";
 
-// import { useAuthContext } from "./hooks/useAuthContext";
+import { useAuthContext } from "./hooks/useAuthContext";
+
+
+function SearchList(){
+
+    return(<div>
+
+    </div>);
+}
 
 // function SearchList() {
 //   const { user } = useAuthContext();
@@ -110,4 +118,4 @@
 //   );
 // }
 
-// export default SearchList;
+export default SearchList;

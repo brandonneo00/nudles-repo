@@ -56,7 +56,6 @@ function Welcome() {
             color="#83C5BE"
             align="center"
           >
-            {/* {userprofiles.map((userprofile) => userprofile.username)} */}
             {userprofiles && <UserDetail userprofiles={userprofiles} />}
           </Text>
           <Text

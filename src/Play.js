@@ -1,3 +1,4 @@
+import "./Play.css";
 import TopBarV2 from "./components/TopBarV2";
 import {
   Text,
@@ -27,8 +28,32 @@ import PopOver from "./components/PopOver";
 import AnswerChecker from "./components/AnswerChecker";
 import KeyboardV2 from "./KeyboardV2";
 import KeyboardV3 from "./KeyboardV3";
+import { useLocation } from "react-router-dom";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  addDoc
+} from "firebase/firestore";
+import { db } from "./firebase/config";
+import { useAuthContext } from "./hooks/useAuthContext";
+import schedule from 'node-schedule';
 
-function Play() {
+function Play(props) {
+
+  var timeNow = new Date();
+  console.log(timeNow);
+
+  schedule.scheduleJob('40 3 * * *', () => {
+    console.log("reset already")
+    doDuringMidnight();
+  })
+  const { user } = useAuthContext();
+
   const [disableBox1, setBox1] = useState(false);
   const [disableBox2, setBox2] = useState(true);
   const [disableBox3, setBox3] = useState(true);
@@ -72,18 +97,26 @@ function Play() {
 
   const [solved, setSolved] = useState(false);
   const [error, setError] = useState(null);
+  const [chosenQn, setChosenQn] = useState("");
+  const [playBefore, setPlayBefore] = useState(false);
+  const [clickBefore, setClickBefore] = useState(false);
+
+  const location = useLocation();
+  const { obj } = location.state;
+
+  var helperArr = [];
 
   const greenColor = "#6AAA64";
   const orangeColor = "#F7B556";
   const greyColor = "#787E7E";
 
-  var ansLength = 5;
+  const guessesDocRef = doc(db, "guesses", user.uid);
 
   //Checks the User's Input for error
   const checkError = (userInput) => {
     if (userInput.includes(" ")) {
       throw Error("Invalid Input");
-    } else if (userInput.length > ansLength) {
+    } else if (userInput.length > chosenQn.answer.length) {
       throw Error("No. of characters exceed answer length!");
     } else if (userInput === "") {
       throw Error("Please key in something");
@@ -302,48 +335,128 @@ function Play() {
       setInput6(finalInput);
     }
   }
+  var instantBox1 = disableBox1;
+  var instantBox2 = disableBox2;
+  var instantBox3 = disableBox3;
+  var instantBox4 = disableBox4;
+  var instantBox5 = disableBox5;
+  var instantBox6 = disableBox6;
+  var instantSolved = solved;
+
+  var tempArr2 = [];
+  var newArr2 = [];
+
+  const setGuessCollection = async () => {
+    const guessesSnap = await getDoc(guessesDocRef);
+    tempArr2 = guessesSnap.data().guessArray;
+    for (let i = 0; i < tempArr2.length; i++) {
+      if (tempArr2[i].modulecode === obj.modulecode &&
+        tempArr2[i].academicyear === obj.academicyear &&
+        tempArr2[i].term === obj.term &&
+        tempArr2[i].creatoruid === obj.creatoruid) {
+        newArr2.push({
+          modulecode: tempArr2[i].modulecode,
+          academicyear: tempArr2[i].academicyear,
+          term: tempArr2[i].term,
+          creatoruid: tempArr2[i].creatoruid,
+          guessBefore: true, //solved ?....
+          guess1: input1,
+          guess2: input2,
+          guess3: input3,
+          guess4: input4,
+          guess5: input5,
+          guess6: input6,
+          boxstate1: instantBox1,
+          boxstate2: instantBox2,
+          boxstate3: instantBox3,
+          boxstate4: instantBox4,
+          boxstate5: instantBox5,
+          boxstate6: instantBox6,
+          solvedstate: instantSolved
+        })
+
+      } else {
+        newArr2.push(tempArr2[i]);
+      }
+    }
+    setDoc(guessesDocRef, { guessArray: newArr2 }, { merge: true });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
     if (!solved) {
       try {
         if (!disableBox1) {
           checkError(input1);
           setBox1(true);
-          paintingKeys(input1, "HELLO");
-          stopAfterCorrect(input1, "HELLO", setBox2);
+          paintingKeys(input1, chosenQn.answer);
+          stopAfterCorrect(input1, chosenQn.answer, setBox2);
+          instantBox1 = true;
+            if (input1 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox2 = false;
+            }
         } else if (!disableBox2) {
           checkError(input2);
           setBox2(true);
-          paintingKeys(input2, "HELLO");
-          stopAfterCorrect(input2, "HELLO", setBox3);
+          paintingKeys(input2, chosenQn.answer);
+          stopAfterCorrect(input2, chosenQn.answer, setBox3);
+          instantBox2 = true;
+            if (input2 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox3 = false;
+            }
         } else if (!disableBox3) {
           checkError(input3);
           setBox3(true);
-          paintingKeys(input3, "HELLO");
-          stopAfterCorrect(input3, "HELLO", setBox4);
+          paintingKeys(input3, chosenQn.answer);
+          stopAfterCorrect(input3, chosenQn.answer, setBox4);
+          instantBox3 = true;
+            if (input3 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox4 = false;
+            }
         } else if (!disableBox4) {
           checkError(input4);
           setBox4(true);
-          paintingKeys(input4, "HELLO");
-          stopAfterCorrect(input4, "HELLO", setBox5);
+          paintingKeys(input4, chosenQn.answer);
+          stopAfterCorrect(input4, chosenQn.answer, setBox5);
+          instantBox4 = true;
+            if (input4 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox5 = false;
+            }
         } else if (!disableBox5) {
           checkError(input5);
           setBox5(true);
-          paintingKeys(input5, "HELLO");
-          stopAfterCorrect(input5, "HELLO", setBox6);
+          paintingKeys(input5, chosenQn.answer);
+          stopAfterCorrect(input5, chosenQn.answer, setBox6);
+          instantBox5 = true;
+            if (input5 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox6 = false;
+            }
         } else {
           checkError(input6);
           setBox6(true);
-          paintingKeys(input6, "HELLO");
-          stopAfterCorrect(input6, "HELLO", null);
+          paintingKeys(input6, chosenQn.answer);
+          stopAfterCorrect(input6, chosenQn.answer, null);
+          instantBox6 = true;
+          instantSolved = true;
           console.log("Done with 6 tries!");
         }
       } catch (e) {
         setError(e);
         console.error(e);
       }
+      setGuessCollection();
     }
   };
 
@@ -369,39 +482,74 @@ function Play() {
       } else if (letter === "ENTER") {
         //If Enter Button Pressed
         setError(null);
+
         try {
           if (!disableBox1) {
             checkError(input1);
             setBox1(true);
-            paintingKeys(input1, "HELLO");
-            stopAfterCorrect(input1, "HELLO", setBox2);
+            paintingKeys(input1, chosenQn.answer);
+            stopAfterCorrect(input1, chosenQn.answer, setBox2);
+            instantBox1 = true;
+            if (input1 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox2 = false;
+            }
           } else if (!disableBox2) {
             checkError(input2);
             setBox2(true);
-            paintingKeys(input2, "HELLO");
-            stopAfterCorrect(input2, "HELLO", setBox3);
+            paintingKeys(input2, chosenQn.answer);
+            stopAfterCorrect(input2, chosenQn.answer, setBox3);
+            instantBox2 = true;
+            if (input2 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox3 = false;
+            }
           } else if (!disableBox3) {
             checkError(input3);
             setBox3(true);
-            paintingKeys(input3, "HELLO");
-            stopAfterCorrect(input3, "HELLO", setBox4);
+            paintingKeys(input3, chosenQn.answer);
+            stopAfterCorrect(input3, chosenQn.answer, setBox4);
+            instantBox3 = true;
+            if (input3 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox4 = false;
+            }
           } else if (!disableBox4) {
             checkError(input4);
             setBox4(true);
-            paintingKeys(input4, "HELLO");
-            stopAfterCorrect(input4, "HELLO", setBox5);
+            paintingKeys(input4, chosenQn.answer);
+            stopAfterCorrect(input4, chosenQn.answer, setBox5);
+            instantBox4 = true;
+            if (input4 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox5 = false;
+            }
           } else if (!disableBox5) {
             checkError(input5);
             setBox5(true);
-            paintingKeys(input5, "HELLO");
-            stopAfterCorrect(input5, "HELLO", setBox6);
+            paintingKeys(input5, chosenQn.answer);
+            stopAfterCorrect(input5, chosenQn.answer, setBox6);
+            instantBox5 = true;
+            if (input5 === chosenQn.answer) {
+              instantSolved = true;
+            } else {
+              instantBox6 = false;
+            }
           } else {
             checkError(input6);
             setBox6(true);
-            paintingKeys(input6, "HELLO");
-            stopAfterCorrect(input6, "HELLO", null);
+            paintingKeys(input6, chosenQn.answer);
+            stopAfterCorrect(input6, chosenQn.answer, null);
+            instantBox6 = true;
+            instantSolved = true;
             console.log("Done with 6 tries!");
           }
+          setGuessCollection();
+
         } catch (e) {
           setError(e);
           console.error(e);
@@ -438,311 +586,1227 @@ function Play() {
     });
   }
 
+  // put in temporary array
+  // run a for loop through the array
+  // in the for loop check if each qn setBefore field is false
+  // if false: choose this question by setting temp variable and set setBefore as true --> break out of for loop
+  // using the temp variable, set the qn, hint, answer, no. of letters [json object already]
+
+
+  var tempArr1 = [];
+  var newArr1 = [];
+  const doDuringMidnight = async () => {
+    const forthedayRef = await getDocs(collection(db, "fortheday"));
+    forthedayRef.forEach((docs) => {
+      // doc.ref.update({resetBefore: false});
+      const currentDoc = doc(db, "fortheday", docs.id);
+      setDoc(currentDoc, { resetBefore: false }, { merge: true });
+    });
+
+    const guessesSnap = await getDoc(guessesDocRef);
+    if (guessesSnap.exists()) {
+      tempArr1 = guessesSnap.data().guessArray;
+      for (let i = 0; i < tempArr1.length; i++) {
+        newArr1.push({
+          modulecode: tempArr1[i].modulecode,
+          academicyear: tempArr1[i].academicyear,
+          term: tempArr1[i].term,
+          creatoruid: tempArr1[i].creatoruid,
+          guessBefore: false,
+          guess1: "",
+          guess2: "",
+          guess3: "",
+          guess4: "",
+          guess5: "",
+          guess6: "",
+          boxstate1: false,
+          boxstate2: true,
+          boxstate3: true,
+          boxstate4: true,
+          boxstate5: true,
+          boxstate6: true,
+          solvedstate: false,
+        })
+      }
+      setDoc(guessesDocRef, { guessArray: newArr1 }, { merge: true });
+      console.log("im here 111111")
+    }
+  }
+
+  var placeholderArr = [];
+  const handleClick = async () => {
+    setChosenQn("");
+
+    //creating reference to the fortheday collection
+    const forthedayRef = collection(db, "fortheday");
+    //creating query against the fortheday collection
+    const forthedayQuery = query(
+      forthedayRef,
+      where("modulecode", "==", obj.modulecode),
+      where("ay", "==", obj.academicyear),
+      where("term", "==", obj.term),
+      where("creatoruid", "==", obj.creatoruid)
+    );
+    //executing the fortheday query
+    const forthedaySnapshot = await getDocs(forthedayQuery);
+    //storing it in a variable
+    var todayObj;
+    forthedaySnapshot.forEach((file) => {
+      todayObj = file;
+    })
+
+    //for guesses collection
+    const guessesSnap = await getDoc(guessesDocRef);
+    let newComer = true;
+
+    if (guessesSnap.exists()) {
+      placeholderArr = guessesSnap.data().guessArray;
+      for (let i = 0; i < placeholderArr.length; i++) {
+        if (placeholderArr[i].modulecode === obj.modulecode &&
+          placeholderArr[i].academicyear === obj.academicyear &&
+          placeholderArr[i].term === obj.term &&
+          placeholderArr[i].creatoruid === obj.creatoruid) {
+          const bool = placeholderArr[i].guessBefore;
+          console.log("2222 before bool")
+          newComer = false;
+          if (bool) {
+            console.log("2222 inside bool")
+            // if resetBefore, display what the user actually guessBefore
+            setInput1(placeholderArr[i].guess1);
+            setInput2(placeholderArr[i].guess2);
+            setInput3(placeholderArr[i].guess3);
+            setInput4(placeholderArr[i].guess4);
+            setInput5(placeholderArr[i].guess5);
+            setInput6(placeholderArr[i].guess6);
+            // disable boxes --> prevent users from clicking the things
+            setBox1(placeholderArr[i].boxstate1);
+            setBox2(placeholderArr[i].boxstate2);
+            setBox3(placeholderArr[i].boxstate3);
+            setBox4(placeholderArr[i].boxstate4);
+            setBox5(placeholderArr[i].boxstate5);
+            setBox6(placeholderArr[i].boxstate6);
+
+            setSolved(placeholderArr[i].solvedstate);
+          }
+          setPlayBefore(true);
+          break;
+        }
+      }
+      // play NUdleS before but first time playing this module before
+      if (newComer) {
+        placeholderArr.push({
+          modulecode: obj.modulecode,
+          academicyear: obj.academicyear,
+          term: obj.term,
+          creatoruid: obj.creatoruid,
+          guessBefore: false,
+          guess1: "",
+          guess2: "",
+          guess3: "",
+          guess4: "",
+          guess5: "",
+          guess6: "",
+          boxstate1: false,
+          boxstate2: true,
+          boxstate3: true,
+          boxstate4: true,
+          boxstate5: true,
+          boxstate6: true,
+          solvedstate: false
+        })
+        setDoc(guessesDocRef, { guessArray: placeholderArr }, { merge: true });
+        console.log("im here 2222222")
+      }
+
+    } else { //If user first time playing nudles (newcomer)
+      setDoc(guessesDocRef, {
+        guessArray: [{
+          modulecode: obj.modulecode,
+          academicyear: obj.academicyear,
+          term: obj.term,
+          creatoruid: obj.creatoruid,
+          guessBefore: false,
+          guess1: "",
+          guess2: "",
+          guess3: "",
+          guess4: "",
+          guess5: "",
+          guess6: "",
+          boxstate1: false,
+          boxstate2: true,
+          boxstate3: true,
+          boxstate4: true,
+          boxstate5: true,
+          boxstate6: true,
+          solvedstate: false
+        }]
+      },
+        { merge: true })
+      console.log("im here 333333")
+
+    }
+
+    const getQuestion = async () => {
+      const querySnapshot = await getDocs(
+        collection(
+          db,
+          "modules",
+          obj.modulecode,
+          obj.academicyear,
+          obj.term,
+          obj.creatoruid
+        )
+      );
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        helperArr.push(doc);
+      });
+
+      for (let i = 0; i < helperArr.length; i++) {
+        const chosenBefore = helperArr[i].data().setBefore;
+        if (!chosenBefore) {
+          //using docID
+          const Ref = doc(
+            db,
+            "modules",
+            obj.modulecode,
+            obj.academicyear,
+            obj.term,
+            obj.creatoruid,
+            helperArr[i].id
+          );
+          //Set the module collection setBefore field as true
+          // setDoc(Ref, { setBefore: true }, { merge: true });
+
+          //Set the fortheday collection resetBefore field as true and change the
+          //question, hint, answer and explanation as the chosen new fields
+          if (todayObj === undefined) {
+            console.log("undefined here")
+            await addDoc(collection(db, "fortheday"), {
+              modulecode: obj.modulecode,
+              ay: obj.academicyear,
+              term: obj.term,
+              creatoruid: obj.creatoruid,
+              question: helperArr[i].data().question,
+              answer: helperArr[i].data().answer,
+              hint: helperArr[i].data().hint,
+              explanation: helperArr[i].data().explanation,
+              resetBefore: true
+            })
+          } else {
+            console.log("i came here")
+            console.log(todayObj + " todayobj")
+            const forTheDayObj = doc(db, "fortheday", todayObj.id)
+            setDoc(forTheDayObj, {
+              question: helperArr[i].data().question,
+              answer: helperArr[i].data().answer,
+              hint: helperArr[i].data().hint,
+              explanation: helperArr[i].data().explanation,
+              resetBefore: true
+            }, { merge: true })
+          }
+
+          break;
+        }
+      }
+    }
+    // if is a totally new entry/selection OR havent reset question cuz before midnight then do this
+    if (todayObj === undefined || !todayObj.data().resetBefore) {
+      getQuestion();
+    }
+
+    //executing the fortheday query
+    const forthedaySnapshot2 = await getDocs(forthedayQuery);
+    //storing it in a variable
+    var todayObj2;
+    forthedaySnapshot2.forEach((file) => {
+      todayObj2 = file;
+    })
+
+    setChosenQn({
+      question: todayObj2.data().question,
+      answer: todayObj2.data().answer,
+      hint: todayObj2.data().hint,
+      explanation: todayObj2.data().explanation
+    });
+    setClickBefore(true);
+  };
+
   return (
-    <div>
+    <div className="background6">
       <TopBarV2 />
+      {!clickBefore ? (
 
-      <Grid>
-        <GridItem
-          bg="#E5E5E5"
-          borderRadius="15px"
-          margin="2% 2% 1%"
-          padding="1.5%"
-        >
-          <Text as="u" align="left" fontSize="1.500vw" fontWeight="bold">
-            Question
-          </Text>
-          <Text align="left" fontSize="1.250vw" fontWeight="bold">
-            {" "}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce nec
-            pretium justo, at bibendum orci. Quisque turpis tortor, viverra sit
-            amet felis eget, lacinia porttitor neque. Morbi sodales volutpat
-            arcu, a sollicitudin neque porta sit amet. Fusce eget condimentum
-            dui. Curabitur posuere vehicula molestie. Sed commodo maximus odio
-            quis mollis.
-          </Text>
+        //////////////////////////////if never click before/////////////////////////
 
-          <Box textAlign="right" marginTop="1rem">
-            <PopOver threeTries={disableBox4 && !solved} />
-            <PopUp completed={!solved} />
-          </Box>
 
-          <Box>
-            {" "}
-            <Text fontSize="1.250vw" fontWeight="bold">
-              {" "}
-              No. of letters in answer: {5}
-            </Text>
-          </Box>
-        </GridItem>
-      </Grid>
-
-      <Center marginBottom="1rem">
-        {error && (
-          <Alert
-            status="error"
-            alignItems="center"
-            justifyContent="center"
-            textAlign="center"
-            fontSize="md"
-            margin="0% 2%"
-            // width="500px"
+        <Center textAlign="center" minHeight="100vh">
+          <Box
+            as="button"
+            height="6vw"
+            lineHeight="1.2"
+            transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+            border="0px"
+            width="20vw"
+            borderRadius="15px"
+            fontSize="2vw"
+            fontWeight="semibold"
+            bg="#F7B556"
+            borderColor=""
+            color="#000000"
+            _hover={{ bg: "#DBA14D" }}
+            _active={{
+              bg: "#F7B556",
+              transform: "scale(0.98)",
+              borderColor: "",
+            }}
+            _focus={{
+              boxShadow:
+                "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+            }}
+            onClick={handleClick}
           >
-            <AlertIcon />
-            <AlertTitle>Error: </AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
-      </Center>
+            Click to Play
+          </Box>
+        </Center>
 
-      {disableBox1 ? (
-        <Grid margin="0.5px">
-          <Center>
+      ) : playBefore ? (
+
+        //////////////////////////////Clicked before && if play before/////////////////////////
+
+
+        <Box minHeight="100vh">
+          <Grid>
             <GridItem
-              bg="#FFFFFF"
+              bg="#E5E5E5"
               borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
+              margin="2% 2% 1%"
+              padding="1.5%"
             >
-              <Center>
-                <HStack spacing={0}> {textCreator(input1, "HELLO")} </HStack>
-              </Center>
-            </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox1}
-          onChange1={handleChangeInput}
-          value1={input1}
-          enter={handleSubmit}
-        />
-      )}
+              <Box marginBottom="1vw">
+                <HStack>
+                  <Text
+                    align="left"
+                    fontSize="1.500vw"
+                    fontWeight="bold"
+                  // textColor={greenColor}
+                  >
+                    {obj.modulecode}
+                  </Text>
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
+                    {"AY " + obj.academicyear + " " + obj.term}
+                  </Text>
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
+                    {"by " + obj.creatorusername}
+                  </Text>
+                </HStack>
+              </Box>
+              <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
+                Question
+              </Text>
+              <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+                {chosenQn.question}
+              </Text>
 
-      {disableBox2 ? (
-        <Grid margin="0.5px">
-          <Center>
+              <Box textAlign="right" marginTop="1rem">
+                <PopOver
+                  threeTries={disableBox4 && !solved}
+                  hint={chosenQn.hint}
+                />
+                <PopUp completed={!solved} chosenQuestion={chosenQn} />
+              </Box>
+
+              <Box>
+                <Text fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+                  No. of letters in answer: {chosenQn.answer.length}
+                </Text>
+              </Box>
+            </GridItem>
+          </Grid>
+
+          <Center marginBottom="1rem">
+            {error && (
+              <Alert
+                status="error"
+                alignItems="center"
+                justifyContent="center"
+                textAlign="center"
+                fontSize="md"
+                margin="0% 2%"
+              // width="500px"
+              >
+                <AlertIcon />
+                <AlertTitle>Error: </AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+              </Alert>
+            )}
+          </Center>
+
+          {disableBox1 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input1, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox1}
+              onChange1={handleChangeInput}
+              value1={input1}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox2 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input2, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox2}
+              onChange1={handleChangeInput}
+              value1={input2}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox3 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input3, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox3}
+              onChange1={handleChangeInput}
+              value1={input3}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox4 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input4, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox4}
+              onChange1={handleChangeInput}
+              value1={input4}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox5 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input5, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox5}
+              onChange1={handleChangeInput}
+              value1={input5}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox6 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input6, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox6}
+              onChange1={handleChangeInput}
+              value1={input6}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          <Box height="1vw"></Box>
+
+          <KeyboardV3
+            manualClick={handleManualClick}
+            colorA={colorA}
+            colorB={colorB}
+            colorC={colorC}
+            colorD={colorD}
+            colorE={colorE}
+            colorF={colorF}
+            colorG={colorG}
+            colorH={colorH}
+            colorI={colorI}
+            colorJ={colorJ}
+            colorK={colorK}
+            colorL={colorL}
+            colorM={colorM}
+            colorN={colorN}
+            colorO={colorO}
+            colorP={colorP}
+            colorQ={colorQ}
+            colorR={colorR}
+            colorS={colorS}
+            colorT={colorT}
+            colorU={colorU}
+            colorV={colorV}
+            colorW={colorW}
+            colorX={colorX}
+            colorY={colorY}
+            colorZ={colorZ}
+          />
+
+          <Box height="3vw" />
+        </Box>
+      ) : (
+
+        //////////////////////////////Click before && if never play before/////////////////////////
+
+
+        <Box minHeight="100vh">
+          <Grid>
             <GridItem
-              bg="#FFFFFF"
+              bg="#E5E5E5"
               borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
+              margin="2% 2% 1%"
+              padding="1.5%"
             >
-              <Center>
-                <HStack spacing={0}> {textCreator(input2, "HELLO")} </HStack>
-              </Center>
+              <Box marginBottom="1vw">
+                <HStack>
+                  <Text
+                    align="left"
+                    fontSize="1.500vw"
+                    fontWeight="bold"
+                  // textColor={greenColor}
+                  >
+                    {obj.modulecode}
+                  </Text>
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
+                    {"AY " + obj.academicyear + " " + obj.term}
+                  </Text>
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
+                    {"by " + obj.creatorusername}
+                  </Text>
+                </HStack>
+              </Box>
+              <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
+                Question
+              </Text>
+              <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+                {chosenQn.question}
+              </Text>
+
+              <Box textAlign="right" marginTop="1rem">
+                <PopOver
+                  threeTries={disableBox4 && !solved}
+                  hint={chosenQn.hint}
+                />
+                <PopUp completed={!solved} chosenQuestion={chosenQn} />
+              </Box>
+
+              <Box>
+                <Text fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+                  No. of letters in answer: {chosenQn.answer.length}
+                </Text>
+              </Box>
             </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox2}
-          onChange1={handleChangeInput}
-          value1={input2}
-          enter={handleSubmit}
-        />
-      )}
+          </Grid>
 
-      {disableBox3 ? (
-        <Grid margin="0.5px">
-          <Center>
-            <GridItem
-              bg="#FFFFFF"
-              borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
-            >
+          <Center marginBottom="1rem">
+            {error && (
+              <Alert
+                status="error"
+                alignItems="center"
+                justifyContent="center"
+                textAlign="center"
+                fontSize="md"
+                margin="0% 2%"
+              // width="500px"
+              >
+                <AlertIcon />
+                <AlertTitle>Error: </AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+              </Alert>
+            )}
+          </Center>
+
+          {disableBox1 ? (
+            <Grid margin="0.5px">
               <Center>
-                <HStack spacing={0}> {textCreator(input3, "HELLO")} </HStack>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input1, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
               </Center>
-            </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox3}
-          onChange1={handleChangeInput}
-          value1={input3}
-          enter={handleSubmit}
-        />
-      )}
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox1}
+              onChange1={handleChangeInput}
+              value1={input1}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
 
-      {disableBox4 ? (
-        <Grid margin="0.5px">
-          <Center>
-            <GridItem
-              bg="#FFFFFF"
-              borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
-            >
+          {disableBox2 ? (
+            <Grid margin="0.5px">
               <Center>
-                <HStack spacing={0}> {textCreator(input4, "HELLO")} </HStack>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input2, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
               </Center>
-            </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox4}
-          onChange1={handleChangeInput}
-          value1={input4}
-          enter={handleSubmit}
-        />
-      )}
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox2}
+              onChange1={handleChangeInput}
+              value1={input2}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
 
-      {disableBox5 ? (
-        <Grid margin="0.5px">
-          <Center>
-            <GridItem
-              bg="#FFFFFF"
-              borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
-            >
+          {disableBox3 ? (
+            <Grid margin="0.5px">
               <Center>
-                <HStack spacing={0}> {textCreator(input5, "HELLO")} </HStack>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input3, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
               </Center>
-            </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox5}
-          onChange1={handleChangeInput}
-          value1={input5}
-          enter={handleSubmit}
-        />
-      )}
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox3}
+              onChange1={handleChangeInput}
+              value1={input3}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
 
-      {disableBox6 ? (
-        <Grid margin="0.5px">
-          <Center>
-            <GridItem
-              bg="#FFFFFF"
-              borderRadius="15px"
-              borderWidth="5px"
-              borderColor="#E5E5E5"
-              margin="0.4rem"
-              padding="0% 1.5%"
-              width="26.042vw"
-              height="3.646vw"
-            >
+          {disableBox4 ? (
+            <Grid margin="0.5px">
               <Center>
-                <HStack spacing={0}> {textCreator(input6, "HELLO")} </HStack>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input4, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
               </Center>
-            </GridItem>
-          </Center>
-        </Grid>
-      ) : (
-        <GuessBox
-          permission={disableBox6}
-          onChange1={handleChangeInput}
-          value1={input6}
-          enter={handleSubmit}
-        />
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox4}
+              onChange1={handleChangeInput}
+              value1={input4}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox5 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input5, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox5}
+              onChange1={handleChangeInput}
+              value1={input5}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          {disableBox6 ? (
+            <Grid margin="0.5px">
+              <Center>
+                <GridItem
+                  bg="#FFFFFF"
+                  borderRadius="15px"
+                  borderWidth="5px"
+                  borderColor="#E5E5E5"
+                  margin="0.4rem"
+                  padding="0% 1.5%"
+                  width="26.042vw"
+                  height="3.646vw"
+                >
+                  <Center>
+                    <HStack spacing={0}>
+                      {" "}
+                      {textCreator(input6, chosenQn.answer)}{" "}
+                    </HStack>
+                  </Center>
+                </GridItem>
+              </Center>
+            </Grid>
+          ) : (
+            <GuessBox
+              permission={disableBox6}
+              onChange1={handleChangeInput}
+              value1={input6}
+              enter={handleSubmit}
+            // enter={handleSubmit(chosenQn.answer)}
+            />
+          )}
+
+          <Box height="1vw"></Box>
+
+          <KeyboardV3
+            manualClick={handleManualClick}
+            colorA={colorA}
+            colorB={colorB}
+            colorC={colorC}
+            colorD={colorD}
+            colorE={colorE}
+            colorF={colorF}
+            colorG={colorG}
+            colorH={colorH}
+            colorI={colorI}
+            colorJ={colorJ}
+            colorK={colorK}
+            colorL={colorL}
+            colorM={colorM}
+            colorN={colorN}
+            colorO={colorO}
+            colorP={colorP}
+            colorQ={colorQ}
+            colorR={colorR}
+            colorS={colorS}
+            colorT={colorT}
+            colorU={colorU}
+            colorV={colorV}
+            colorW={colorW}
+            colorX={colorX}
+            colorY={colorY}
+            colorZ={colorZ}
+          />
+
+          <Box height="3vw" />
+        </Box>
       )}
-
-      <Box height="1vw"></Box>
-
-      <KeyboardV3
-        manualClick={handleManualClick}
-        colorA={colorA}
-        colorB={colorB}
-        colorC={colorC}
-        colorD={colorD}
-        colorE={colorE}
-        colorF={colorF}
-        colorG={colorG}
-        colorH={colorH}
-        colorI={colorI}
-        colorJ={colorJ}
-        colorK={colorK}
-        colorL={colorL}
-        colorM={colorM}
-        colorN={colorN}
-        colorO={colorO}
-        colorP={colorP}
-        colorQ={colorQ}
-        colorR={colorR}
-        colorS={colorS}
-        colorT={colorT}
-        colorU={colorU}
-        colorV={colorV}
-        colorW={colorW}
-        colorX={colorX}
-        colorY={colorY}
-        colorZ={colorZ}
-      />
-
-      {/* <Center>
-        {error && (
-          <Alert
-            status="error"
-            alignItems="center"
-            justifyContent="center"
-            textAlign="center"
-            marginTop="1rem"
-            fontSize="md"
-            width="500px"
-          >
-            <AlertIcon />
-            <AlertTitle>Error: </AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
-        )}
-      </Center> */}
-
-      {/* {error && (
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Error</ModalHeader>
-          <ModalBody>{error.message}</ModalBody>
-          <ModalFooter>
-            <Button
-              onClick={onClose}
-              bg="#F7B556"
-              _hover={{ bg: "#DBA14D" }}
-              _active={{
-                bg: "#F7B556",
-                transform: "scale(0.98)",
-                borderColor: "",
-              }}
-              _focus={{
-                boxShadow:
-                  "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
-              }}
-            >
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> 
-)} */}
-      <Box height="3vw" />
     </div>
   );
+
+
+
+
+
+  // return (
+  //   <div className="background6">
+  //     <TopBarV2 />
+  //     {!playBefore ? (
+  //       <Center textAlign="center" minHeight="100vh">
+  //         <Box
+  //           as="button"
+  //           height="6vw"
+  //           lineHeight="1.2"
+  //           transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+  //           border="0px"
+  //           width="20vw"
+  //           borderRadius="15px"
+  //           fontSize="2vw"
+  //           fontWeight="semibold"
+  //           bg="#F7B556"
+  //           borderColor=""
+  //           color="#000000"
+  //           _hover={{ bg: "#DBA14D" }}
+  //           _active={{
+  //             bg: "#F7B556",
+  //             transform: "scale(0.98)",
+  //             borderColor: "",
+  //           }}
+  //           _focus={{
+  //             boxShadow:
+  //               "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+  //           }}
+  //           onClick={handleClick}
+  //         >
+  //           Click to Play
+  //         </Box>
+  //       </Center>
+
+  //     ) : chosenQn !== "" ? (
+  //       <Box minHeight="100vh">
+  //         <Grid>
+  //           <GridItem
+  //             bg="#E5E5E5"
+  //             borderRadius="15px"
+  //             margin="2% 2% 1%"
+  //             padding="1.5%"
+  //           >
+  //             <Box marginBottom="1vw">
+  //               <HStack>
+  //                 <Text
+  //                   align="left"
+  //                   fontSize="1.500vw"
+  //                   fontWeight="bold"
+  //                 // textColor={greenColor}
+  //                 >
+  //                   {obj.modulecode}
+  //                 </Text>
+  //                 <Text align="left" fontSize="1.500vw" fontWeight="bold">
+  //                   {"AY " + obj.academicyear + " " + obj.term}
+  //                 </Text>
+  //                 <Text align="left" fontSize="1.500vw" fontWeight="bold">
+  //                   {"by " + obj.creatorusername}
+  //                 </Text>
+  //               </HStack>
+  //             </Box>
+  //             <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
+  //               Question
+  //             </Text>
+  //             <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+  //               {chosenQn.question}
+  //             </Text>
+
+  //             <Box textAlign="right" marginTop="1rem">
+  //               <PopOver
+  //                 threeTries={disableBox4 && !solved}
+  //                 hint={chosenQn.hint}
+  //               />
+  //               <PopUp completed={!solved} chosenQuestion={chosenQn} />
+  //             </Box>
+
+  //             <Box>
+  //               <Text fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+  //                 No. of letters in answer: {chosenQn.answer.length}
+  //               </Text>
+  //             </Box>
+  //           </GridItem>
+  //         </Grid>
+
+  //         <Center marginBottom="1rem">
+  //           {error && (
+  //             <Alert
+  //               status="error"
+  //               alignItems="center"
+  //               justifyContent="center"
+  //               textAlign="center"
+  //               fontSize="md"
+  //               margin="0% 2%"
+  //             // width="500px"
+  //             >
+  //               <AlertIcon />
+  //               <AlertTitle>Error: </AlertTitle>
+  //               <AlertDescription>{error.message}</AlertDescription>
+  //             </Alert>
+  //           )}
+  //         </Center>
+
+  //         {disableBox1 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input1, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox1}
+  //             onChange1={handleChangeInput}
+  //             value1={input1}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         {disableBox2 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input2, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox2}
+  //             onChange1={handleChangeInput}
+  //             value1={input2}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         {disableBox3 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input3, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox3}
+  //             onChange1={handleChangeInput}
+  //             value1={input3}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         {disableBox4 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input4, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox4}
+  //             onChange1={handleChangeInput}
+  //             value1={input4}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         {disableBox5 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input5, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox5}
+  //             onChange1={handleChangeInput}
+  //             value1={input5}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         {disableBox6 ? (
+  //           <Grid margin="0.5px">
+  //             <Center>
+  //               <GridItem
+  //                 bg="#FFFFFF"
+  //                 borderRadius="15px"
+  //                 borderWidth="5px"
+  //                 borderColor="#E5E5E5"
+  //                 margin="0.4rem"
+  //                 padding="0% 1.5%"
+  //                 width="26.042vw"
+  //                 height="3.646vw"
+  //               >
+  //                 <Center>
+  //                   <HStack spacing={0}>
+  //                     {" "}
+  //                     {textCreator(input6, chosenQn.answer)}{" "}
+  //                   </HStack>
+  //                 </Center>
+  //               </GridItem>
+  //             </Center>
+  //           </Grid>
+  //         ) : (
+  //           <GuessBox
+  //             permission={disableBox6}
+  //             onChange1={handleChangeInput}
+  //             value1={input6}
+  //             enter={handleSubmit}
+  //           // enter={handleSubmit(chosenQn.answer)}
+  //           />
+  //         )}
+
+  //         <Box height="1vw"></Box>
+
+  //         <KeyboardV3
+  //           manualClick={handleManualClick}
+  //           colorA={colorA}
+  //           colorB={colorB}
+  //           colorC={colorC}
+  //           colorD={colorD}
+  //           colorE={colorE}
+  //           colorF={colorF}
+  //           colorG={colorG}
+  //           colorH={colorH}
+  //           colorI={colorI}
+  //           colorJ={colorJ}
+  //           colorK={colorK}
+  //           colorL={colorL}
+  //           colorM={colorM}
+  //           colorN={colorN}
+  //           colorO={colorO}
+  //           colorP={colorP}
+  //           colorQ={colorQ}
+  //           colorR={colorR}
+  //           colorS={colorS}
+  //           colorT={colorT}
+  //           colorU={colorU}
+  //           colorV={colorV}
+  //           colorW={colorW}
+  //           colorX={colorX}
+  //           colorY={colorY}
+  //           colorZ={colorZ}
+  //         />
+
+  //         <Box height="3vw" />
+  //       </Box>
+  //     ) : (
+  //       alert("Run Out of Questions")
+  //     )}
+  //   </div>
+  // );
 }
 
 export default Play;

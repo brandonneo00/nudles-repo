@@ -3,25 +3,19 @@ import { HStack, VStack, Text, Box, Center } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { db } from "./firebase/config";
 import {
-  doc,
-  getDoc,
   collection,
-  query,
-  where,
   getDocs,
-  setDoc,
-  snapshotEqual,
 } from "firebase/firestore";
 import { useState } from "react";
 
-function CompiledQuestions(props) {
+function CompiledQuestions() {
   const [resultArray, setResultArray] = useState("");
   const [clicked, setClicked] = useState(false);
   var placeholder = [];
   const location = useLocation();
   const { obj } = location.state;
   console.log(obj + "this is obj");
-  // handleShow helps tofetch the data and display onto the CompiledQuestion page
+  // handleShow helps to fetch the data and display onto the CompiledQuestion page
   const handleShow = async () => {
     setResultArray("");
     setClicked(false);
@@ -61,18 +55,6 @@ function CompiledQuestions(props) {
       );
     });
   }
-
-
-
-  // query to the modules collection here
-
-
-  // retrieve it into an array 
-
-  // map it to the style and aesthetic we want in this page 
-
-  // export to ResourceLibrary page
-
   return (
     <div id="pdf">
       {clicked ?

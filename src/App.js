@@ -20,7 +20,6 @@ import CompiledQuestions from "./CompiledQuestions";
 
 function App() {
   const { user, authIsReady } = useAuthContext();
-  // const { a, b } = useRestrict();
   return (
     <>
       <div>
@@ -48,10 +47,6 @@ function App() {
             <Route exact path="/Play">
               {user && <Play />}
               {!user && <Redirect to="/" />}
-              {/* {(fromMS) ?  <Play/> : <Redirect to="/ModuleSelection"/>} */}
-              {/* {fromMS && <Play />}
-              {!fromMS && <Redirect to="/ModuleSelection" />} */}
-
             </Route>
             <Route exact path="/ResourceLibrary">
               {user && <ResourceLibrary />}

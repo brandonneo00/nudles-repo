@@ -3,7 +3,6 @@ import AddImage from "./images/add.png";
 import Bin from "./images/bin.png";
 
 import {
-  Center,
   Text,
   Image,
   VStack,
@@ -20,21 +19,22 @@ import {
   IconButton,
   Tooltip,
   Select,
+  Center,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  AlertTitle,
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
-// import work from "./images/work-in-progress.png";
 
 import { useState, useEffect } from "react";
-import { useCollection } from "./hooks/useCollection";
 import {
   doc,
   collection,
   query,
   where,
   getDocs,
-  addDoc,
   getDoc,
-  collectionGroup,
   setDoc,
 } from "firebase/firestore";
 
@@ -118,14 +118,12 @@ function Search() {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
       var tempArray = docSnap.data().modarray;
 
       let allDifferent = true;
       // check if moduleObj exists in the modarray field
       for (let i = 0; i < tempArray.length; i++) {
         if (_.isEqual(tempArray[i], moduleObj)) {
-          console.log("inside same");
           allDifferent = false;
           break;
         }
@@ -134,13 +132,11 @@ function Search() {
       // push moduleObj into the temparray
       if (allDifferent) {
         tempArray.push(moduleObj);
-        console.log("this is after pushing into temp array " + tempArray);
       }
       // updating the modarray field of the doc
       await setDoc(docRef, { modarray: tempArray });
     } else {
       // doc.data() will be undefined in this case
-      console.log("No such document!");
       // set the modarray field if the field is empty
       await setDoc(docRef, { modarray: [moduleObj] });
     }
@@ -150,13 +146,13 @@ function Search() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setResArray("");
+    setError("");
 
     try {
       checkSearchError(academicyear);
       console.log("i am sleepy and i want a nap");
       //creating reference to the questions collection in our firestore database
       const qnRef = collection(db, "questions");
-      console.log("3.05pm");
       //creating query against the collection
 
       const _q = query(
@@ -165,16 +161,15 @@ function Search() {
         where("academicyear", "==", academicyear),
         where("term", "==", term)
       );
+
       // executing the query
       const qn_querySnapshot = await getDocs(_q);
-      var uniqueSet = new Set();
 
-      console.log("been here before uuuuuu");
+      var uniqueSet = new Set();
+      var hasEntered = false;
 
       qn_querySnapshot.forEach((docs) => {
-        console.log("it is almost dinner time");
-        console.log(docs.id, " => ", docs.data());
-        console.log("time to go kith");
+        hasEntered = true;
 
         if (!uniqueSet.has(docs.data().uid)) {
           uniqueSet.add(docs.data().uid);
@@ -190,7 +185,6 @@ function Search() {
           const snapShot1 = async () => {
             const qUserRef = await getDocs(queryUserRef);
             qUserRef.forEach((file) => (nameHolder = file.data().username));
-            console.log("this " + nameHolder);
 
             helper.push({
               modcode: docs.data().module,
@@ -206,6 +200,10 @@ function Search() {
           snapShot1();
         }
       });
+
+      if (!hasEntered) {
+        throw Error("Sorry! No such module created yet!");
+      }
 
       setModuleCode("");
       setAcademicYear("");
@@ -264,7 +262,6 @@ function Search() {
                   id="modulecode"
                   name="modulecode"
                   variant="filled"
-                  // width="8.5rem"
                   width="9vw"
                   height="1.875vw"
                   placeholder="E.g. CS1101S"
@@ -288,7 +285,6 @@ function Search() {
                   id="modulecode"
                   name="academic year"
                   variant="filled"
-                  // width="8.5rem"
                   width="9vw"
                   height="1.875vw"
                   placeholder="Academic Year"
@@ -305,7 +301,6 @@ function Search() {
                   height="2vw"
                   fontSize="1.2vw"
                   iconSize="1vw"
-                  // textColor="#8891A4"
                 >
                   <option>Semester 1</option>
                   <option>Semester 2</option>
@@ -314,18 +309,14 @@ function Search() {
                 </Select>
 
                 <Box
-                  // className="buttons"
                   as="button"
-                  // height="43px"
                   height="2vw"
                   lineHeight="1.2"
                   transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
                   border="0px"
-                  // width="150px"
                   width="7.813vw"
                   borderRadius="15px"
                   fontSize="1.2vw"
-                  // fontSize="20px"
                   fontWeight="semibold"
                   bg="#83C5BE"
                   borderColor="#ccd0d5"
@@ -347,9 +338,25 @@ function Search() {
           </VStack>
         </form>
       </Formik>
+      <Center marginTop="1rem">
+        {error && (
+          <Alert
+            status="error"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            fontSize="md"
+            margin="0% 2%"
+          >
+            <AlertIcon />
+            <AlertTitle>Error: </AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
+        )}
+      </Center>
 
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="2%" padding="1.5%">
+        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%">
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text
@@ -479,7 +486,6 @@ function Search() {
                       fontSize="1.5vw"
                       noOfLines={1}
                     >
-                      {/* {element.modname} */}
                       <ModuleNameAPI ay={element.ay} mc={element.modcode}>
                         {" "}
                       </ModuleNameAPI>

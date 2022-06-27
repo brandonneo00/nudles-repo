@@ -3,27 +3,7 @@ import {
   HStack,
   VStack,
   Text,
-  Center,
-  Container,
-  Flex,
-  Spacer,
-  Grid,
-  GridItem,
-  Textarea,
-  Input,
-  FormControl,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  FormLabel,
-  Select,
 } from "@chakra-ui/react";
-
-import { Formik, Field } from "formik";
-
-import { useState } from "react";
 
 function KeyBoardV2(props) {
   const firstRow = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];

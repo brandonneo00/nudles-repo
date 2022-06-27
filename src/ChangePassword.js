@@ -79,11 +79,9 @@ function ChangePassword() {
                       variant="filled"
                       validate={(value) => {
                         let error;
-
                         if (value.length < 5) {
                           error = "Password must contain at least 6 characters";
                         }
-
                         return error;
                       }}
                     />

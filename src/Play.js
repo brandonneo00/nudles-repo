@@ -11,22 +11,12 @@ import {
   AlertTitle,
   AlertIcon,
   Center,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Button,
 } from "@chakra-ui/react";
 import GuessBox from "./GuessBox";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import PopUp from "./components/PopUp";
 import PopOver from "./components/PopOver";
 import AnswerChecker from "./components/AnswerChecker";
-import KeyboardV2 from "./KeyboardV2";
 import KeyboardV3 from "./KeyboardV3";
 import { useLocation } from "react-router-dom";
 import {
@@ -48,7 +38,7 @@ function Play(props) {
   var timeNow = new Date();
   console.log(timeNow);
 
-  schedule.scheduleJob('40 3 * * *', () => {
+  schedule.scheduleJob('0 0 * * *', () => {
     console.log("reset already")
     doDuringMidnight();
   })
@@ -359,7 +349,7 @@ function Play(props) {
           academicyear: tempArr2[i].academicyear,
           term: tempArr2[i].term,
           creatoruid: tempArr2[i].creatoruid,
-          guessBefore: true, //solved ?....
+          guessBefore: true,
           guess1: input1,
           guess2: input2,
           guess3: input3,
@@ -394,55 +384,55 @@ function Play(props) {
           paintingKeys(input1, chosenQn.answer);
           stopAfterCorrect(input1, chosenQn.answer, setBox2);
           instantBox1 = true;
-            if (input1 === chosenQn.answer) {
-              instantSolved = true;
-            } else {
-              instantBox2 = false;
-            }
+          if (input1 === chosenQn.answer) {
+            instantSolved = true;
+          } else {
+            instantBox2 = false;
+          }
         } else if (!disableBox2) {
           checkError(input2);
           setBox2(true);
           paintingKeys(input2, chosenQn.answer);
           stopAfterCorrect(input2, chosenQn.answer, setBox3);
           instantBox2 = true;
-            if (input2 === chosenQn.answer) {
-              instantSolved = true;
-            } else {
-              instantBox3 = false;
-            }
+          if (input2 === chosenQn.answer) {
+            instantSolved = true;
+          } else {
+            instantBox3 = false;
+          }
         } else if (!disableBox3) {
           checkError(input3);
           setBox3(true);
           paintingKeys(input3, chosenQn.answer);
           stopAfterCorrect(input3, chosenQn.answer, setBox4);
           instantBox3 = true;
-            if (input3 === chosenQn.answer) {
-              instantSolved = true;
-            } else {
-              instantBox4 = false;
-            }
+          if (input3 === chosenQn.answer) {
+            instantSolved = true;
+          } else {
+            instantBox4 = false;
+          }
         } else if (!disableBox4) {
           checkError(input4);
           setBox4(true);
           paintingKeys(input4, chosenQn.answer);
           stopAfterCorrect(input4, chosenQn.answer, setBox5);
           instantBox4 = true;
-            if (input4 === chosenQn.answer) {
-              instantSolved = true;
-            } else {
-              instantBox5 = false;
-            }
+          if (input4 === chosenQn.answer) {
+            instantSolved = true;
+          } else {
+            instantBox5 = false;
+          }
         } else if (!disableBox5) {
           checkError(input5);
           setBox5(true);
           paintingKeys(input5, chosenQn.answer);
           stopAfterCorrect(input5, chosenQn.answer, setBox6);
           instantBox5 = true;
-            if (input5 === chosenQn.answer) {
-              instantSolved = true;
-            } else {
-              instantBox6 = false;
-            }
+          if (input5 === chosenQn.answer) {
+            instantSolved = true;
+          } else {
+            instantBox6 = false;
+          }
         } else {
           checkError(input6);
           setBox6(true);
@@ -598,7 +588,6 @@ function Play(props) {
   const doDuringMidnight = async () => {
     const forthedayRef = await getDocs(collection(db, "fortheday"));
     forthedayRef.forEach((docs) => {
-      // doc.ref.update({resetBefore: false});
       const currentDoc = doc(db, "fortheday", docs.id);
       setDoc(currentDoc, { resetBefore: false }, { merge: true });
     });
@@ -629,7 +618,6 @@ function Play(props) {
         })
       }
       setDoc(guessesDocRef, { guessArray: newArr1 }, { merge: true });
-      console.log("im here 111111")
     }
   }
 
@@ -667,10 +655,8 @@ function Play(props) {
           placeholderArr[i].term === obj.term &&
           placeholderArr[i].creatoruid === obj.creatoruid) {
           const bool = placeholderArr[i].guessBefore;
-          console.log("2222 before bool")
           newComer = false;
           if (bool) {
-            console.log("2222 inside bool")
             // if resetBefore, display what the user actually guessBefore
             setInput1(placeholderArr[i].guess1);
             setInput2(placeholderArr[i].guess2);
@@ -715,7 +701,6 @@ function Play(props) {
           solvedstate: false
         })
         setDoc(guessesDocRef, { guessArray: placeholderArr }, { merge: true });
-        console.log("im here 2222222")
       }
 
     } else { //If user first time playing nudles (newcomer)
@@ -742,8 +727,6 @@ function Play(props) {
         }]
       },
         { merge: true })
-      console.log("im here 333333")
-
     }
 
     const getQuestion = async () => {
@@ -758,7 +741,6 @@ function Play(props) {
         )
       );
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
         helperArr.push(doc);
       });
 
@@ -776,12 +758,11 @@ function Play(props) {
             helperArr[i].id
           );
           //Set the module collection setBefore field as true
-          // setDoc(Ref, { setBefore: true }, { merge: true });
+          setDoc(Ref, { setBefore: true }, { merge: true });
 
           //Set the fortheday collection resetBefore field as true and change the
           //question, hint, answer and explanation as the chosen new fields
           if (todayObj === undefined) {
-            console.log("undefined here")
             await addDoc(collection(db, "fortheday"), {
               modulecode: obj.modulecode,
               ay: obj.academicyear,
@@ -794,8 +775,6 @@ function Play(props) {
               resetBefore: true
             })
           } else {
-            console.log("i came here")
-            console.log(todayObj + " todayobj")
             const forTheDayObj = doc(db, "fortheday", todayObj.id)
             setDoc(forTheDayObj, {
               question: helperArr[i].data().question,
@@ -839,7 +818,6 @@ function Play(props) {
 
         //////////////////////////////if never click before/////////////////////////
 
-
         <Center textAlign="center" minHeight="100vh">
           <Box
             as="button"
@@ -847,7 +825,7 @@ function Play(props) {
             lineHeight="1.2"
             transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
             border="0px"
-            width="20vw"
+            width="24vw"
             borderRadius="15px"
             fontSize="2vw"
             fontWeight="semibold"
@@ -866,14 +844,13 @@ function Play(props) {
             }}
             onClick={handleClick}
           >
-            Click to Play
+            Double-Click to Play
           </Box>
         </Center>
 
       ) : playBefore ? (
 
         //////////////////////////////Clicked before && if play before/////////////////////////
-
 
         <Box minHeight="100vh">
           <Grid>
@@ -889,7 +866,6 @@ function Play(props) {
                     align="left"
                     fontSize="1.500vw"
                     fontWeight="bold"
-                  // textColor={greenColor}
                   >
                     {obj.modulecode}
                   </Text>
@@ -933,7 +909,6 @@ function Play(props) {
                 textAlign="center"
                 fontSize="md"
                 margin="0% 2%"
-              // width="500px"
               >
                 <AlertIcon />
                 <AlertTitle>Error: </AlertTitle>
@@ -970,7 +945,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input1}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1002,7 +976,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input2}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1034,7 +1007,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input3}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1066,7 +1038,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input4}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1098,7 +1069,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input5}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1130,7 +1100,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input6}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1172,7 +1141,6 @@ function Play(props) {
 
         //////////////////////////////Click before && if never play before/////////////////////////
 
-
         <Box minHeight="100vh">
           <Grid>
             <GridItem
@@ -1187,7 +1155,6 @@ function Play(props) {
                     align="left"
                     fontSize="1.500vw"
                     fontWeight="bold"
-                  // textColor={greenColor}
                   >
                     {obj.modulecode}
                   </Text>
@@ -1231,7 +1198,6 @@ function Play(props) {
                 textAlign="center"
                 fontSize="md"
                 margin="0% 2%"
-              // width="500px"
               >
                 <AlertIcon />
                 <AlertTitle>Error: </AlertTitle>
@@ -1268,7 +1234,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input1}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1300,7 +1265,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input2}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1332,7 +1296,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input3}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1364,7 +1327,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input4}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1396,7 +1358,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input5}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1428,7 +1389,6 @@ function Play(props) {
               onChange1={handleChangeInput}
               value1={input6}
               enter={handleSubmit}
-            // enter={handleSubmit(chosenQn.answer)}
             />
           )}
 
@@ -1470,343 +1430,6 @@ function Play(props) {
     </div>
   );
 
-
-
-
-
-  // return (
-  //   <div className="background6">
-  //     <TopBarV2 />
-  //     {!playBefore ? (
-  //       <Center textAlign="center" minHeight="100vh">
-  //         <Box
-  //           as="button"
-  //           height="6vw"
-  //           lineHeight="1.2"
-  //           transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
-  //           border="0px"
-  //           width="20vw"
-  //           borderRadius="15px"
-  //           fontSize="2vw"
-  //           fontWeight="semibold"
-  //           bg="#F7B556"
-  //           borderColor=""
-  //           color="#000000"
-  //           _hover={{ bg: "#DBA14D" }}
-  //           _active={{
-  //             bg: "#F7B556",
-  //             transform: "scale(0.98)",
-  //             borderColor: "",
-  //           }}
-  //           _focus={{
-  //             boxShadow:
-  //               "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
-  //           }}
-  //           onClick={handleClick}
-  //         >
-  //           Click to Play
-  //         </Box>
-  //       </Center>
-
-  //     ) : chosenQn !== "" ? (
-  //       <Box minHeight="100vh">
-  //         <Grid>
-  //           <GridItem
-  //             bg="#E5E5E5"
-  //             borderRadius="15px"
-  //             margin="2% 2% 1%"
-  //             padding="1.5%"
-  //           >
-  //             <Box marginBottom="1vw">
-  //               <HStack>
-  //                 <Text
-  //                   align="left"
-  //                   fontSize="1.500vw"
-  //                   fontWeight="bold"
-  //                 // textColor={greenColor}
-  //                 >
-  //                   {obj.modulecode}
-  //                 </Text>
-  //                 <Text align="left" fontSize="1.500vw" fontWeight="bold">
-  //                   {"AY " + obj.academicyear + " " + obj.term}
-  //                 </Text>
-  //                 <Text align="left" fontSize="1.500vw" fontWeight="bold">
-  //                   {"by " + obj.creatorusername}
-  //                 </Text>
-  //               </HStack>
-  //             </Box>
-  //             <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
-  //               Question
-  //             </Text>
-  //             <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
-  //               {chosenQn.question}
-  //             </Text>
-
-  //             <Box textAlign="right" marginTop="1rem">
-  //               <PopOver
-  //                 threeTries={disableBox4 && !solved}
-  //                 hint={chosenQn.hint}
-  //               />
-  //               <PopUp completed={!solved} chosenQuestion={chosenQn} />
-  //             </Box>
-
-  //             <Box>
-  //               <Text fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
-  //                 No. of letters in answer: {chosenQn.answer.length}
-  //               </Text>
-  //             </Box>
-  //           </GridItem>
-  //         </Grid>
-
-  //         <Center marginBottom="1rem">
-  //           {error && (
-  //             <Alert
-  //               status="error"
-  //               alignItems="center"
-  //               justifyContent="center"
-  //               textAlign="center"
-  //               fontSize="md"
-  //               margin="0% 2%"
-  //             // width="500px"
-  //             >
-  //               <AlertIcon />
-  //               <AlertTitle>Error: </AlertTitle>
-  //               <AlertDescription>{error.message}</AlertDescription>
-  //             </Alert>
-  //           )}
-  //         </Center>
-
-  //         {disableBox1 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input1, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox1}
-  //             onChange1={handleChangeInput}
-  //             value1={input1}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         {disableBox2 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input2, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox2}
-  //             onChange1={handleChangeInput}
-  //             value1={input2}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         {disableBox3 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input3, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox3}
-  //             onChange1={handleChangeInput}
-  //             value1={input3}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         {disableBox4 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input4, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox4}
-  //             onChange1={handleChangeInput}
-  //             value1={input4}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         {disableBox5 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input5, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox5}
-  //             onChange1={handleChangeInput}
-  //             value1={input5}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         {disableBox6 ? (
-  //           <Grid margin="0.5px">
-  //             <Center>
-  //               <GridItem
-  //                 bg="#FFFFFF"
-  //                 borderRadius="15px"
-  //                 borderWidth="5px"
-  //                 borderColor="#E5E5E5"
-  //                 margin="0.4rem"
-  //                 padding="0% 1.5%"
-  //                 width="26.042vw"
-  //                 height="3.646vw"
-  //               >
-  //                 <Center>
-  //                   <HStack spacing={0}>
-  //                     {" "}
-  //                     {textCreator(input6, chosenQn.answer)}{" "}
-  //                   </HStack>
-  //                 </Center>
-  //               </GridItem>
-  //             </Center>
-  //           </Grid>
-  //         ) : (
-  //           <GuessBox
-  //             permission={disableBox6}
-  //             onChange1={handleChangeInput}
-  //             value1={input6}
-  //             enter={handleSubmit}
-  //           // enter={handleSubmit(chosenQn.answer)}
-  //           />
-  //         )}
-
-  //         <Box height="1vw"></Box>
-
-  //         <KeyboardV3
-  //           manualClick={handleManualClick}
-  //           colorA={colorA}
-  //           colorB={colorB}
-  //           colorC={colorC}
-  //           colorD={colorD}
-  //           colorE={colorE}
-  //           colorF={colorF}
-  //           colorG={colorG}
-  //           colorH={colorH}
-  //           colorI={colorI}
-  //           colorJ={colorJ}
-  //           colorK={colorK}
-  //           colorL={colorL}
-  //           colorM={colorM}
-  //           colorN={colorN}
-  //           colorO={colorO}
-  //           colorP={colorP}
-  //           colorQ={colorQ}
-  //           colorR={colorR}
-  //           colorS={colorS}
-  //           colorT={colorT}
-  //           colorU={colorU}
-  //           colorV={colorV}
-  //           colorW={colorW}
-  //           colorX={colorX}
-  //           colorY={colorY}
-  //           colorZ={colorZ}
-  //         />
-
-  //         <Box height="3vw" />
-  //       </Box>
-  //     ) : (
-  //       alert("Run Out of Questions")
-  //     )}
-  //   </div>
-  // );
 }
 
 export default Play;

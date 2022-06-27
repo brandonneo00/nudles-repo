@@ -37,7 +37,6 @@ function ForgetPassword() {
         console.log("Set success to true");
       }
     };
-
     setTimeout(checker, 500);
     setError("");
   };

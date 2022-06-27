@@ -16,12 +16,11 @@ import { useState } from "react";
 // firebase imports
 import { db } from "./firebase/config";
 import { collection, addDoc } from "firebase/firestore";
-import { useCollection } from "./hooks/useCollection";
 
 // specific for UID of users
 import { useAuthContext } from "./hooks/useAuthContext";
 
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 function UpdateProfile() {
   const [checkbox, setCheckBox] = useState("");
@@ -45,12 +44,6 @@ function UpdateProfile() {
     setNusNetID("");
     setTimeout(() => history.push("/Welcome"), 300);
   };
-
-  const { documents: userprofiles } = useCollection("userprofiles", [
-    "uid",
-    "==",
-    user.uid,
-  ]);
 
   return (
     <>

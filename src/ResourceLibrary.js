@@ -1,5 +1,4 @@
 import TopBarV2 from "./components/TopBarV2";
-import Download from "./images/download.png";
 import Preview from "./images/preview.png";
 
 import {
@@ -20,32 +19,27 @@ import {
   IconButton,
   Tooltip,
   Select,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  AlertTitle
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
-// import work from "./images/work-in-progress.png";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import {
-  doc,
   collection,
   query,
   where,
   getDocs,
-  addDoc,
-  getDoc,
-  collectionGroup,
-  setDoc,
 } from "firebase/firestore";
 
 // importing our firestore database object
 import { db } from "./firebase/config";
 import "./Search.css";
-import { jsPDF } from "jspdf";
-
 
 function ResourceLibrary() {
-  //const [searchInput, setSearchInput] = useState("");
   const [modulecode, setModuleCode] = useState("");
   const [academicyear, setAcademicYear] = useState("");
   const [term, setTerm] = useState("");
@@ -93,8 +87,8 @@ function ResourceLibrary() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // alert("hello");
     setResultArr("");
+    setError("");
 
     try {
       checkSearchInput(academicyear);
@@ -109,10 +103,12 @@ function ResourceLibrary() {
       );
       // creating a Js Set to store unique unique academicyear, modulecode, term
       var setUnique = new Set();
+      var hasEntered = false;
 
       //executing the query
       const qnCollectionQuerySnapshot = await getDocs(qnCollectionQuery);
       qnCollectionQuerySnapshot.forEach((doc) => {
+        hasEntered = true;
         if (!setUnique.has(doc.data().uid)) {
           setUnique.add(doc.data().uid);
 
@@ -139,11 +135,13 @@ function ResourceLibrary() {
             });
 
             setResultArr(helperArr);
-            console.log(helperArr + " 24 june testest");
           };
           hello();
         }
       });
+      if (!hasEntered) {
+        throw Error("Sorry! No such module created yet");
+      }
       setModuleCode("");
       setAcademicYear("");
       setTerm("");
@@ -177,7 +175,6 @@ function ResourceLibrary() {
                   id="modulecode"
                   name="modulecode"
                   variant="filled"
-                  // width="8.5rem"
                   width="9vw"
                   height="1.875vw"
                   placeholder="E.g. CS1101S"
@@ -201,7 +198,6 @@ function ResourceLibrary() {
                   id="modulecode"
                   name="academic year"
                   variant="filled"
-                  // width="8.5rem"
                   width="9vw"
                   height="1.875vw"
                   placeholder="Academic Year"
@@ -218,7 +214,6 @@ function ResourceLibrary() {
                   height="2vw"
                   fontSize="1.2vw"
                   iconSize="1vw"
-                  // textColor="#8891A4"
                 >
                   <option>Semester 1</option>
                   <option>Semester 2</option>
@@ -227,18 +222,14 @@ function ResourceLibrary() {
                 </Select>
 
                 <Box
-                  // className="buttons"
                   as="button"
-                  // height="43px"
                   height="2vw"
                   lineHeight="1.2"
                   transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
                   border="0px"
-                  // width="150px"
                   width="7.813vw"
                   borderRadius="15px"
                   fontSize="1.2vw"
-                  // fontSize="20px"
                   fontWeight="semibold"
                   bg="#83C5BE"
                   borderColor="#ccd0d5"
@@ -261,8 +252,26 @@ function ResourceLibrary() {
         </form>
       </Formik>
 
+      <Center marginTop="1rem">
+        {error && (
+          <Alert
+            status="error"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            fontSize="md"
+            margin="0% 2%"
+          >
+            <AlertIcon />
+            <AlertTitle>Error: </AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
+        )}
+      </Center>
+
+
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="2%" padding="1.5%">
+        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%">
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text
@@ -380,7 +389,6 @@ function ResourceLibrary() {
                       fontSize="1.5vw"
                       noOfLines={1}
                     >
-                      {/* {element.modname} */}
                       <ModuleNameAPI ay={element.ay} mc={element.modcode}>
                         {" "}
                       </ModuleNameAPI>
@@ -451,32 +459,32 @@ function ResourceLibrary() {
 
                 <Spacer />
                 <Link to={{
-                pathname: "/CompiledQuestions",
-                state: {obj: element}
-              }}>
-                <Box width="10vw" textAlign="center" padding="0.9vw 0">
-                  <Button
-                    className="download-button"
-                    as={IconButton}
-                    variant="ghost"
-                    icon={
-                      <Image
-                        src={Preview}
-                        alt="preview-logo"
-                        boxSize="2.5vw"
-                      />
-                    }
-                    boxSize="2.5vw"
-                    borderWidth="0px"
-                    bg="#ffffff00"
-                    _hover={{ bg: "#ffffff00" }}
-                    _active={{
-                      bg: "#ffffff00",
-                      transform: "scale(0.98)",
-                    }}
-                    padding="0px"
-                  ></Button>
-                </Box>
+                  pathname: "/CompiledQuestions",
+                  state: { obj: element }
+                }}>
+                  <Box width="10vw" textAlign="center" padding="0.9vw 0">
+                    <Button
+                      className="download-button"
+                      as={IconButton}
+                      variant="ghost"
+                      icon={
+                        <Image
+                          src={Preview}
+                          alt="preview-logo"
+                          boxSize="2.5vw"
+                        />
+                      }
+                      boxSize="2.5vw"
+                      borderWidth="0px"
+                      bg="#ffffff00"
+                      _hover={{ bg: "#ffffff00" }}
+                      _active={{
+                        bg: "#ffffff00",
+                        transform: "scale(0.98)",
+                      }}
+                      padding="0px"
+                    ></Button>
+                  </Box>
                 </Link>
               </Flex>
             ))}

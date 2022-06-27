@@ -1,5 +1,3 @@
-import React from "react";
-
 function AnswerChecker(userInput, correctAns) {
   const inputLength = userInput.length;
   const greenColor = "#6AAA64";

@@ -1,19 +1,10 @@
-import { Center, Text, Grid, GridItem, Input, Box, HStack } from "@chakra-ui/react";
+import { Center, Grid, GridItem, Input, HStack } from "@chakra-ui/react";
 import {
   FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
 } from "@chakra-ui/react";
-import { useState } from "react";
 
 import { Field, Formik } from "formik";
 function GuessBox(props) {
-  // const [guess, setGuess] = useState("");
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setGuess(null);
-  // };
   return (
     <Grid margin="0.5px">
       <Center>
@@ -27,9 +18,6 @@ function GuessBox(props) {
           width="26.042vw"
           height="3.646vw"
         >
-          {/* <Text align="center" fontSize="2.083vw" fontWeight="bold">
-            Guesses
-          </Text> */}
           <Formik>
             <form onSubmit={props.enter}>
               <FormControl color="black">

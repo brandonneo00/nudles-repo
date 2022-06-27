@@ -2,56 +2,21 @@ import TopBarV2 from "./components/TopBarV2";
 import {
   Box,
   HStack,
-  VStack,
   Text,
-  Center,
-  Container,
-  Flex,
-  Spacer,
-  Grid,
-  GridItem,
-  Textarea,
-  Input,
-  FormControl,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  FormLabel,
-  Select,
-  Heading,
   Tooltip,
-  LinkOverlay,
-  LinkBox
 } from "@chakra-ui/react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { db } from "./firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuthContext } from "./hooks/useAuthContext";
 import { useState, useEffect } from "react";
-// import { useRestrict } from "./hooks/useRestrict";
 
 function ModuleSelection() {
   const { user } = useAuthContext();
   const [buttonclick, setButtonClick] = useState(false);
   const [likedArray, setLikedArray] = useState("");
-  // const { fromMS, checkFromMS } = useRestrict();
-  let history = useHistory();
-  //get user.uid data from the likedmodules collection
-  
+
   var helperArr = [];
-  
-  // const docRef = doc(db, "likedmodules", user.uid);
-  // const snapShot = async () => {
-  //   const docSnap = await getDoc(docRef);
-  //   setLikedArray("");
-  //   if (docSnap.exists()) {
-  //     helperArr = docSnap.data().modarray;
-  //     setLikedArray(helperArr);
-  //   }
-  // };
-  // snapShot();
 
   function formatYear(acadyear) {
     return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
@@ -77,7 +42,7 @@ function ModuleSelection() {
     return moduleName;
   }
 
-  
+
   const handleClick = async () => {
     const docRef = doc(db, "likedmodules", user.uid);
     const docSnap = await getDoc(docRef);
@@ -86,12 +51,13 @@ function ModuleSelection() {
       helperArr = docSnap.data().modarray;
       setLikedArray(helperArr);
     }
-    
-    if (buttonclick){
+
+    if (buttonclick) {
       setButtonClick(false)
     } else {
-    setButtonClick(true);
-  }}
+      setButtonClick(true);
+    }
+  }
   return (
     <div>
       <TopBarV2 />
@@ -142,89 +108,81 @@ function ModuleSelection() {
             likedArray.map((obj, index) => (
               <Link to={{
                 pathname: "/Play",
-                state: {obj: obj}
+                state: { obj: obj }
               }}
-              key={index}
-              // onClick={() => {
-              //   checkFromMS();
-              //   console.log(fromMS + " this is from ms");
-              //   return history.push("/Play");
-              // }}
-              >
-              <Box
-                as="button"
                 key={index}
-                borderRadius="15px"
-                width="18.594vw"
-                height="8.333vw"
-                bg="#E5E5E5"
-                _hover={{ bg: "#C7C7C7" }}
-                _active={{
-                bg: "#E5E5E5",
-                transform: "scale(0.98)",
-                borderColor: ""
-              }}
-              _focus={{
-                boxShadow:
-                  "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
-              }}
-              // onClick={checkFromMS}
               >
-              
-                <Text
-                  fontSize="1.042vw"
-                  fontWeight="semibold"
-                  color="#686B6F"
-                  align="left"
-                  margin="1% 5% 0%"
-                >
-                  {obj.modulecode}
-                </Text>
-                <Tooltip
-                  label={
-                    <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
-                      {" "}
-                    </ModuleNameAPI>
-                  }
-                  placement="bottom-start"
+                <Box
+                  as="button"
+                  key={index}
+                  borderRadius="15px"
+                  width="18.594vw"
+                  height="8.333vw"
+                  bg="#E5E5E5"
+                  _hover={{ bg: "#C7C7C7" }}
+                  _active={{
+                    bg: "#E5E5E5",
+                    transform: "scale(0.98)",
+                    borderColor: ""
+                  }}
+                  _focus={{
+                    boxShadow:
+                      "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+                  }}
                 >
                   <Text
-                    fontSize="1.250vw"
+                    fontSize="1.042vw"
                     fontWeight="semibold"
-                    color="#000000"
+                    color="#686B6F"
                     align="left"
-                    margin="0% 5% 3%"
-                    noOfLines={1}
+                    margin="1% 5% 0%"
                   >
-                    <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
-                      {" "}
-                    </ModuleNameAPI>
+                    {obj.modulecode}
                   </Text>
-                </Tooltip>
-                <Text
-                  fontSize="1.042vw"
-                  fontWeight="semibold"
-                  color="#686B6F"
-                  align="left"
-                  margin="0% 5%"
-                >
-                  {"AY " + obj.academicyear + " " + obj.term}
-                </Text>
-                <Tooltip label={obj.creatorusername} placement="bottom-start">
+                  <Tooltip
+                    label={
+                      <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
+                        {" "}
+                      </ModuleNameAPI>
+                    }
+                    placement="bottom-start"
+                  >
+                    <Text
+                      fontSize="1.250vw"
+                      fontWeight="semibold"
+                      color="#000000"
+                      align="left"
+                      margin="0% 5% 3%"
+                      noOfLines={1}
+                    >
+                      <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
+                        {" "}
+                      </ModuleNameAPI>
+                    </Text>
+                  </Tooltip>
                   <Text
                     fontSize="1.042vw"
                     fontWeight="semibold"
                     color="#686B6F"
                     align="left"
                     margin="0% 5%"
-                    noOfLines={1}
                   >
-                    {obj.creatorusername}
+                    {"AY " + obj.academicyear + " " + obj.term}
                   </Text>
-                </Tooltip>
-              </Box>
+                  <Tooltip label={obj.creatorusername} placement="bottom-start">
+                    <Text
+                      fontSize="1.042vw"
+                      fontWeight="semibold"
+                      color="#686B6F"
+                      align="left"
+                      margin="0% 5%"
+                      noOfLines={1}
+                    >
+                      {obj.creatorusername}
+                    </Text>
+                  </Tooltip>
+                </Box>
               </Link>
-             
             ))}
         </HStack>
       </Box>

@@ -6,7 +6,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
@@ -39,7 +38,6 @@ function PopUp(props) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Daily NUdleS</ModalHeader>
-          {/* <ModalCloseButton /> */}
           <ModalHeader>Question</ModalHeader>
           <ModalBody>{props.chosenQuestion.question}</ModalBody>
           <ModalHeader>Answer</ModalHeader>

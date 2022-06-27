@@ -6,26 +6,17 @@ import {
   Text,
   Center,
   Container,
-  Flex,
-  Spacer,
   Grid,
   GridItem,
   Textarea,
   Input,
   FormControl,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  FormLabel,
   Select,
   Alert,
   AlertIcon,
   AlertDescription,
   AlertTitle,
 } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import "./InputQuestion.css";
 import { Formik, Field } from "formik";
 import { useState } from "react";
@@ -33,8 +24,8 @@ import { useState } from "react";
 import { useCollection } from "./hooks/useCollection";
 
 import { db } from "./firebase/config";
-import { doc, deleteDoc } from "firebase/firestore"; // for deleting or updating documemts
-import { collection, addDoc, setDoc, getDocs, query, where, updateDoc} from "firebase/firestore";
+import { doc } from "firebase/firestore"; // for deleting or updating documemts
+import { collection, addDoc, getDocs, query, where, updateDoc, setDoc } from "firebase/firestore";
 
 import QuestionList from "./QuestionList";
 import { useAuthContext } from "./hooks/useAuthContext";
@@ -69,7 +60,7 @@ function InputQuestion() {
     }
   };
 
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -80,20 +71,7 @@ function InputQuestion() {
       //First reference to initial database
       const ref = collection(db, "questions");
 
-      //Reference to second database
-      const refTwo = collection(
-        db,
-        "modules",
-        modulecode.toUpperCase(),
-        academicyear,
-        term,
-        user.uid
-      );
-
-      // first argument is the ref that we want to add the object to
-      // second argument is the actual object that we want to input into the ref
-
-      await addDoc(ref, {
+      const qnDoc = await addDoc(ref, {
         module: modulecode.toUpperCase(),
         question: question.toUpperCase(),
         answer: answer.toUpperCase(),
@@ -105,21 +83,21 @@ function InputQuestion() {
         setBefore: false
       });
 
-      //const q = query(ref, where("", "==", ""));
+      console.log(qnDoc.id + " This is qn id in qn collections")
 
-      // const q = query(collection(db, "questions"), where("uid", "==", user.uid));
-      // const querySnapshot = await getDocs(q);
-      // querySnapshot.forEach((docs) => {
-      //   // doc.data() is never undefined for query doc snapshots
-      //   console.log(docs.id, " => ", docs.data());
-      //   updateDoc(doc(db, "questions", docs.id), {qid: docs.id});
-      // });
+      //Reference to second database
+      const refTwo = doc(
+        db,
+        "modules",
+        modulecode.toUpperCase(),
+        academicyear,
+        term,
+        user.uid,
+        qnDoc.id
+      );
 
-
-      await addDoc(
-        refTwo,
-        {
-          module: modulecode.toUpperCase(),
+      await setDoc(refTwo, {
+        module: modulecode.toUpperCase(),
           question: question.toUpperCase(),
           answer: answer.toUpperCase(),
           hint: hint.toUpperCase(),
@@ -132,25 +110,7 @@ function InputQuestion() {
         { merge: true }
       );
 
-      setPATH("modules" + "/" + modulecode.toUpperCase() + "/" + academicyear  + "/" + term + "/" + user.uid);
-
-      var array = [];
-      const qModules = query(collection(db, "modules", modulecode.toUpperCase(), academicyear, term, user.uid), where("uid", "==", user.uid));
-      const qModulesSnapshot = await getDocs(qModules);
-      qModulesSnapshot.forEach((docs) => {
-        array.push(docs.id);
-      })
-
-      const q = query(collection(db, "questions"), 
-      where("uid", "==", user.uid), 
-      where("module", "==", modulecode.toUpperCase()), 
-      where("academicyear", "==", academicyear),
-      where("term", "==", term));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((docs) => {
-        updateDoc(doc(db, "questions", docs.id), {qid: array[0]});
-        array.shift();
-      });
+      setPATH("modules" + "/" + modulecode.toUpperCase() + "/" + academicyear + "/" + term + "/" + user.uid);
 
       setModuleCode("");
       setQuestion("");
@@ -165,29 +125,18 @@ function InputQuestion() {
     }
   };
 
-
-  // const handleDelete = async (id) => {
-  //   console.log(id)
-
-  //   // first argument is the database that we want to connet to
-  //   // second argument is the specific collection
-  //   // third arugment is the id of the document we want to reference to
-  //   const docRef = doc(db, "questions", id);
-  //   await deleteDoc(docRef);
-  // };
-
   const { documents: questions } = useCollection("questions", [
     "uid",
     "==",
     user.uid,
   ]);
-  
+
   const { documents: MODULES } = useCollection(
     PATH, [
-        "uid",
-        "==",
-        user.uid
-      ]
+    "uid",
+    "==",
+    user.uid
+  ]
   );
 
   return (
@@ -358,7 +307,6 @@ function InputQuestion() {
                       height="2vw"
                       fontSize="0.833vw"
                     />
-                    {/* <FormControl isRequired> */}
                     <Select
                       variant="filled"
                       placeholder="Term"
@@ -374,7 +322,6 @@ function InputQuestion() {
                       <option>Special Term 1</option>
                       <option>Special Term 2</option>
                     </Select>
-                    {/* </FormControl> */}
                     <Box
                       className="buttons"
                       as="button"
@@ -558,13 +505,8 @@ function InputQuestion() {
               </HStack>
 
               <Center>
-                {/* {questions && (
-                  <QuestionList questions={questions} modules={MODULES} path={PATH} />
-                )}
-
-                 */}
-                 {MODULES && (
-                  <QuestionList modules={MODULES} path={PATH} questions={questions}/>
+                {MODULES && (
+                  <QuestionList modules={MODULES} path={PATH} questions={questions} />
                 )}
 
               </Center>

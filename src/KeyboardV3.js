@@ -3,26 +3,7 @@ import {
   HStack,
   VStack,
   Text,
-  Center,
-  Container,
-  Flex,
-  Spacer,
-  Grid,
-  GridItem,
-  Textarea,
-  Input,
-  FormControl,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  FormLabel,
-  Select,
 } from "@chakra-ui/react";
-
-
-import { useState } from "react";
 
 function KeyboardV3(props) {
 

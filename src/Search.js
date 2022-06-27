@@ -277,7 +277,7 @@ function Search() {
                     lineHeight="1.3"
                     align="left"
                   >
-                    Academic Year
+                    ACADEMIC YEAR
                   </Text>
                 </Box>
                 <Field

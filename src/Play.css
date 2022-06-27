@@ -10,7 +10,7 @@
 
 .background6 {
     background-color: #ffffff;
-    opacity: 0.8;
+    opacity: 1;
     background-size: 26px 26px;
     background-image: repeating-linear-gradient(0deg, #83C5BE, #83C5BE 1.3px, #ffffff 1.3px, #ffffff);
 }

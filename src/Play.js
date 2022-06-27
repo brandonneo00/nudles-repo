@@ -42,8 +42,8 @@ function Play(props) {
     console.log("reset already")
     doDuringMidnight();
   })
-  const { user } = useAuthContext();
 
+  const { user } = useAuthContext();
   const [disableBox1, setBox1] = useState(false);
   const [disableBox2, setBox2] = useState(true);
   const [disableBox3, setBox3] = useState(true);

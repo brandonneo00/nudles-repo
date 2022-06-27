@@ -6,7 +6,7 @@ import {
   collection,
   getDocs,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 function CompiledQuestions() {
   const [resultArray, setResultArray] = useState("");
@@ -55,12 +55,16 @@ function CompiledQuestions() {
       );
     });
   }
+
+  const elementRef = useRef(null);
+  var currentHeight = 60;
+
   return (
     <div id="pdf">
       {clicked ?
         (<Box padding="10px 16px" width="595px" height="842px">
           <Text align="left"
-            fontSize="20px"
+            fontSize="18px"
             fontWeight="bold"
           >Compiled Questions for {obj.modcode}</Text>
           <Text align="left"
@@ -76,22 +80,22 @@ function CompiledQuestions() {
           >Created By {obj.createdby}</Text>
 
           {resultArray && resultArray.map((element, index) => (
-            <Box key={index} borderColor="#000000" marginBottom="10px">
+            <Box key={index} borderColor="#000000" marginBottom="10px" ref={elementRef}>
               <VStack spacing={0} align="left">
                 <Text
-                  fontSize="14px"
+                  fontSize="11px"
                   fontWeight="bold">{(index + 1) + ") " + element.question}</Text>
                 <HStack spacing="5px">
-                <Text fontSize="14px" fontWeight="bold">&emsp;Hint: </Text>
-                <Text fontSize="14px">{element.hint}</Text>
+                <Text fontSize="10px" fontWeight="bold">Hint: </Text>
+                <Text fontSize="10px">{element.hint}</Text>
                 </HStack>
                 <HStack spacing="5px">
-                <Text fontSize="14px" fontWeight="bold">&emsp;Answer: </Text>
-                <Text fontSize="14px">{element.answer}</Text>
+                <Text fontSize="10px" fontWeight="bold">Answer: </Text>
+                <Text fontSize="10px">{element.answer}</Text>
                 </HStack>
                 <HStack spacing="5px">
-                <Text fontSize="14px" fontWeight="bold">&emsp;Explanation: </Text>
-                <Text fontSize="14px">{element.explanation}</Text>
+                <Text fontSize="10px" fontWeight="bold">Explanation: </Text>
+                <Text fontSize="10px">{element.explanation}</Text>
                 </HStack>
               </VStack>
             </Box>

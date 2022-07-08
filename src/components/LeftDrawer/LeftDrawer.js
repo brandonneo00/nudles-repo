@@ -104,7 +104,7 @@ function LeftDrawer() {
                       margin="0px 0px 0px 8px"
                     />
                     <Text fontSize="26px" fontWeight="semibold" color="#686B6F">
-                      SELECT MODULES
+                      DAILY NUDLES
                     </Text>
                   </HStack>
                 </NavLink>

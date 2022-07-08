@@ -307,6 +307,7 @@ function Play(props) {
       setSolved(true);
     }
   }
+  
   function handleChangeInput(event) {
     event.preventDefault();
 

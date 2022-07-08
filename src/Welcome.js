@@ -81,6 +81,7 @@ function Welcome() {
         </Text>
       </Center>
       <div className="module-page">
+      
         <Center>
           <Box
             className="dotted-box"
@@ -91,6 +92,7 @@ function Welcome() {
             margin="8%"
           ></Box>
         </Center>
+        
         <Box padding="5%">
           <Text
             fontSize="48px"

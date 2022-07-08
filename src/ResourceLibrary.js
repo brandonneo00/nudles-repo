@@ -200,7 +200,7 @@ function ResourceLibrary() {
                   variant="filled"
                   width="9vw"
                   height="1.875vw"
-                  placeholder="Academic Year"
+                  placeholder="E.g. 21-22"
                   onChange={(e) => setAcademicYear(e.target.value)}
                   value={academicyear}
                 />

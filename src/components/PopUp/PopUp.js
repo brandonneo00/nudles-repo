@@ -30,19 +30,22 @@ function PopUp(props) {
           boxShadow:
             "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
         }}
+        width="5.5vw"
+        height="2.5vw"
+        fontSize="1vw"
       >
         Answer
       </Button>
 
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
+      <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Daily NUdleS</ModalHeader>
-          <ModalHeader>Question</ModalHeader>
+        <ModalContent fontSize="1vw">
+          <ModalHeader fontSize="1vw">Daily NUdleS</ModalHeader>
+          <ModalHeader fontSize="1vw">Question</ModalHeader>
           <ModalBody>{props.chosenQuestion.question}</ModalBody>
-          <ModalHeader>Answer</ModalHeader>
+          <ModalHeader fontSize="1vw">Answer</ModalHeader>
           <ModalBody>{props.chosenQuestion.answer}</ModalBody>
-          <ModalHeader>Explanation</ModalHeader>
+          <ModalHeader fontSize="1vw">Explanation</ModalHeader>
           <ModalBody>{props.chosenQuestion.explanation}</ModalBody>
           <ModalFooter>
             <Button
@@ -58,6 +61,10 @@ function PopUp(props) {
                 boxShadow:
                   "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
               }}
+              fontSize="1vw"
+              width="8vw"
+              height="2vw"
+              
             >
               Slurping Out
             </Button>

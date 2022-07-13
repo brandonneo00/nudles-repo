@@ -32,7 +32,7 @@ export default function QuestionList(props) {
 
 
   return (
-    <Box>
+    <Box overflowY="scroll" maxHeight="40vw">
       {props.questions.map((question, index) => (
         <HStack
           border="1px"

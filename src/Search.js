@@ -248,8 +248,8 @@ function Search() {
     return moduleName;
   }
 
-  return (
-    <div>
+  return ( 
+    <div className="searchdiv">
       <TopBarV2 />
       <Formik>
         <form onSubmit={handleSubmit}>
@@ -518,7 +518,7 @@ function Search() {
 
           {resArray &&
             resArray.map((element, index) => (
-              <>
+              <div key={index}>
                 <Flex key={index} marginBottom="1vw">
                   <Tooltip label={element.modcode}>
                     <Container
@@ -686,7 +686,7 @@ function Search() {
                     ></Button>
                   </Box>
                 </Flex>
-              </>
+              </div>
             ))}
 
         </GridItem>

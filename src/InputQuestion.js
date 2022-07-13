@@ -98,15 +98,15 @@ function InputQuestion() {
 
       await setDoc(refTwo, {
         module: modulecode.toUpperCase(),
-          question: question.toUpperCase(),
-          answer: answer.toUpperCase(),
-          hint: hint.toUpperCase(),
-          explanation: explanation.toUpperCase(),
-          academicyear: academicyear,
-          term: term,
-          uid: user.uid,
-          setBefore: false
-        },
+        question: question.toUpperCase(),
+        answer: answer.toUpperCase(),
+        hint: hint.toUpperCase(),
+        explanation: explanation.toUpperCase(),
+        academicyear: academicyear,
+        term: term,
+        uid: user.uid,
+        setBefore: false
+      },
         { merge: true }
       );
 
@@ -295,7 +295,7 @@ function InputQuestion() {
                         ACADEMIC YEAR
                       </Text>
                     </Box>
-                    <Field
+                    {/* <Field
                       as={Input}
                       id="modulecode"
                       name="modulecode"
@@ -306,7 +306,23 @@ function InputQuestion() {
                       value={academicyear}
                       height="2vw"
                       fontSize="0.833vw"
-                    />
+                    /> */}
+                    {/* new dropdown for the searches */}
+                    <Select
+                      variant="filled"
+                      placeholder="Academic Year"
+                      width="11vw"
+                      onChange={(e) => setAcademicYear(e.target.value)}
+                      value={academicyear}
+                      height="2vw"
+                      fontSize="1.2vw"
+                      iconSize="1vw"
+                      isRequired
+                    >
+                      <option>20-21</option>
+                      <option>21-22</option>
+                      <option>22-23</option>
+                    </Select>
                     <Select
                       variant="filled"
                       placeholder="Term"
@@ -314,7 +330,7 @@ function InputQuestion() {
                       onChange={(e) => setTerm(e.target.value)}
                       value={term}
                       height="2vw"
-                      fontSize="0.833vw"
+                      fontSize="1.2vw"
                       iconSize="1vw"
                     >
                       <option>Semester 1</option>

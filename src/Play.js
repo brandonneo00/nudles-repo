@@ -58,6 +58,7 @@ function Play(props) {
   const [input5, setInput5] = useState("");
   const [input6, setInput6] = useState("");
 
+  //for letters on the keyboard
   const [colorA, setColorA] = useState("#E5E5E5");
   const [colorB, setColorB] = useState("#E5E5E5");
   const [colorC, setColorC] = useState("#E5E5E5");
@@ -84,6 +85,18 @@ function Play(props) {
   const [colorX, setColorX] = useState("#E5E5E5");
   const [colorY, setColorY] = useState("#E5E5E5");
   const [colorZ, setColorZ] = useState("#E5E5E5");
+
+  //for numbers on the keyboard
+  const [colorOne, setColorOne] = useState("#E5E5E5");
+  const [colorTwo, setColorTwo] = useState("#E5E5E5");
+  const [colorThree, setColorThree] = useState("#E5E5E5");
+  const [colorFour, setColorFour] = useState("#E5E5E5");
+  const [colorFive, setColorFive] = useState("#E5E5E5");
+  const [colorSix, setColorSix] = useState("#E5E5E5");
+  const [colorSeven, setColorSeven] = useState("#E5E5E5");
+  const [colorEight, setColorEight] = useState("#E5E5E5");
+  const [colorNine, setColorNine] = useState("#E5E5E5");
+  const [colorZero, setColorZero] = useState("#E5E5E5");
 
   const [solved, setSolved] = useState(false);
   const [error, setError] = useState(null);
@@ -167,6 +180,26 @@ function Play(props) {
       setColorY(greenColor);
     } else if (alphabet === "Z") {
       setColorZ(greenColor);
+    } else if (alphabet === "1") { //start of color coding for the numbers on the keyboard
+      setColorOne(greenColor);
+    } else if (alphabet === "2") {
+      setColorTwo(greenColor); 
+    } else if (alphabet === "3") {
+      setColorThree(greenColor);
+    } else if (alphabet === "4") {
+      setColorFour(greenColor);
+    } else if (alphabet === "5") {
+      setColorFive(greenColor);
+    } else if (alphabet === "6") {
+      setColorSix(greenColor);
+    } else if (alphabet === "7") {
+      setColorSeven(greenColor);
+    } else if (alphabet === "8") {
+      setColorEight(greenColor);
+    } else if (alphabet === "9") {
+      setColorNine(greenColor);
+    } else if (alphabet === "0") {
+      setColorZero(greenColor);
     }
   }
 
@@ -224,6 +257,26 @@ function Play(props) {
       setColorY(orangeColor);
     } else if (alphabet === "Z" && colorZ !== greenColor) {
       setColorZ(orangeColor);
+    } else if (alphabet === "1" && colorOne !== greenColor) { //start of color coding for the numbers on the keyboard
+      setColorOne(orangeColor);
+    } else if (alphabet === "2" && colorTwo !== greenColor) {
+      setColorTwo(orangeColor); 
+    } else if (alphabet === "3" && colorThree !== greenColor) {
+      setColorThree(orangeColor);
+    } else if (alphabet === "4" && colorFour !== greenColor) {
+      setColorFour(orangeColor);
+    } else if (alphabet === "5" && colorFive !== greenColor) {
+      setColorFive(orangeColor);
+    } else if (alphabet === "6" && colorSix !== greenColor) {
+      setColorSix(orangeColor);
+    } else if (alphabet === "7" && colorSeven !== greenColor) {
+      setColorSeven(orangeColor);
+    } else if (alphabet === "8" && colorEight !== greenColor) {
+      setColorEight(orangeColor);
+    } else if (alphabet === "9" && colorNine !== greenColor) {
+      setColorNine(orangeColor);
+    } else if (alphabet === "0" && colorZero !== greenColor) {
+      setColorZero(orangeColor);
     }
   }
 
@@ -281,6 +334,26 @@ function Play(props) {
       setColorY(greyColor);
     } else if (alphabet === "Z") {
       setColorZ(greyColor);
+    } else if (alphabet === "1") { //start of color coding for the numbers on the keyboard
+      setColorOne(greyColor);
+    } else if (alphabet === "2") {
+      setColorTwo(greyColor); 
+    } else if (alphabet === "3") {
+      setColorThree(greyColor);
+    } else if (alphabet === "4") {
+      setColorFour(greyColor);
+    } else if (alphabet === "5") {
+      setColorFive(greyColor);
+    } else if (alphabet === "6") {
+      setColorSix(greyColor);
+    } else if (alphabet === "7") {
+      setColorSeven(greyColor);
+    } else if (alphabet === "8") {
+      setColorEight(greyColor);
+    } else if (alphabet === "9") {
+      setColorNine(greyColor);
+    } else if (alphabet === "0") {
+      setColorZero(greyColor);
     }
   }
 
@@ -1134,6 +1207,16 @@ function Play(props) {
             colorX={colorX}
             colorY={colorY}
             colorZ={colorZ}
+            colorOne={colorOne}
+            colorTwo={colorTwo}
+            colorThree={colorThree}
+            colorFour={colorFour}
+            colorFive={colorFive}
+            colorSix={colorSix}
+            colorSeven={colorSeven}
+            colorEight={colorEight}
+            colorNine={colorNine}
+            colorZero={colorZero}
           />
 
           <Box height="3vw" />

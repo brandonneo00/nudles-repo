@@ -50,7 +50,10 @@ function Search() {
   const [term, setTerm] = useState("");
   const [error, setError] = useState(null);
   const [resArray, setResArray] = useState("");
+  const [added, setAdded] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { user } = useAuthContext();
+  const [deleted, setDeleted] = useState(false);
 
   var helper = [];
 
@@ -74,6 +77,8 @@ function Search() {
     creatorUsername,
     creatorUID
   ) => {
+    setDeleted(false);
+    setAdded(false);
     const moduleObj = {
       modulecode: moduleCode,
       academicyear: academicYear,
@@ -96,6 +101,7 @@ function Search() {
       }
       await setDoc(docRef, { modarray: newArray });
     }
+    setDeleted(true);
   };
 
   const handleAdd = async (
@@ -105,6 +111,8 @@ function Search() {
     creatorUsername,
     creatorUID
   ) => {
+    setAdded(false);
+    setDeleted(false);
     const moduleObj = {
       modulecode: moduleCode,
       academicyear: academicYear,
@@ -141,16 +149,18 @@ function Search() {
       await setDoc(docRef, { modarray: [moduleObj] });
     }
     //If empty/not inside then we add
+    setAdded(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setResArray("");
     setError("");
+    setAdded(false);
+    setDeleted(false);
 
     try {
       checkSearchError(academicyear);
-      console.log("i am sleepy and i want a nap");
       //creating reference to the questions collection in our firestore database
       const qnRef = collection(db, "questions");
       //creating query against the collection
@@ -267,6 +277,7 @@ function Search() {
                   placeholder="E.g. CS1101S"
                   onChange={(e) => setModuleCode(e.target.value)}
                   value={modulecode.toUpperCase()}
+                  fontSize="1.2vw"
                 />
 
                 <Box>
@@ -280,7 +291,7 @@ function Search() {
                     ACADEMIC YEAR
                   </Text>
                 </Box>
-                <Field
+                {/* <Field
                   as={Input}
                   id="modulecode"
                   name="academic year"
@@ -290,7 +301,24 @@ function Search() {
                   placeholder="E.g. 21-22"
                   onChange={(e) => setAcademicYear(e.target.value)}
                   value={academicyear}
-                />
+                /> */}
+
+                {/* new dropdown for the searches */}
+                <Select
+                  variant="filled"
+                  placeholder="Academic Year"
+                  width="10vw"
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  value={academicyear}
+                  height="2vw"
+                  fontSize="1.2vw"
+                  iconSize="1vw"
+                  isRequired
+                >
+                  <option>20-21</option>
+                  <option>21-22</option>
+                  <option>22-23</option>
+                </Select>
 
                 <Select
                   variant="filled"
@@ -338,25 +366,70 @@ function Search() {
           </VStack>
         </form>
       </Formik>
+
+
       <Center marginTop="1rem">
-        {error && (
-          <Alert
+        {error ? 
+        (<Alert
             status="error"
             alignItems="center"
             justifyContent="center"
             textAlign="center"
-            fontSize="md"
+            fontSize="1vw"
             margin="0% 2%"
+            height="3vw"
+
           >
-            <AlertIcon />
+            <AlertIcon boxSize="1vw"/>
             <AlertTitle>Error: </AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
+        </Alert>)
+        : deleted
+        ? (
+          <Alert
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            status="warning"
+            fontSize="1vw"
+            margin="0% 2%"
+            height="3vw"
+          >
+            <AlertIcon boxSize="1vw" />
+            <AlertTitle>Module Deleted! </AlertTitle>
+            <AlertDescription>Deleted from your favourite list!</AlertDescription>
+            
           </Alert>
-        )}
+        )
+        : added
+        ? (
+          <Alert
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            status="success"
+            fontSize="1vw"
+            margin="0% 2%"
+            height="3vw"
+          >
+            <AlertIcon boxSize="1vw" />
+            <AlertTitle>Module Added! </AlertTitle>
+            <AlertDescription>Successfully added to your favourite list!</AlertDescription>
+            
+          </Alert>
+        )
+        :null
+          
+        }
       </Center>
 
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%">
+        <GridItem
+          bg="#E5E5E5"
+          borderRadius="15px"
+          margin="1% 2% 2%"
+          padding="1.5%"
+        >
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text
@@ -445,174 +518,177 @@ function Search() {
 
           {resArray &&
             resArray.map((element, index) => (
-              <Flex key={index} marginBottom="1vw">
-                <Tooltip label={element.modcode}>
-                  <Container
-                    height="4vw"
-                    width="12vw"
-                    borderRadius="10px"
-                    bg="#EDF6F9"
-                    padding="0.9vw 0"
-                  >
-                    <Text
-                      fontWeight="semibold"
-                      textAlign="center"
-                      fontSize="1.5vw"
+              <>
+                <Flex key={index} marginBottom="1vw">
+                  <Tooltip label={element.modcode}>
+                    <Container
+                      height="4vw"
+                      width="12vw"
+                      borderRadius="10px"
+                      bg="#EDF6F9"
+                      padding="0.9vw 0"
                     >
-                      {element.modcode}
-                    </Text>
-                  </Container>
-                </Tooltip>
+                      <Text
+                        fontWeight="semibold"
+                        textAlign="center"
+                        fontSize="1.5vw"
+                      >
+                        {element.modcode}
+                      </Text>
+                    </Container>
+                  </Tooltip>
 
-                <Spacer />
+                  <Spacer />
 
-                <Tooltip
-                  label={
-                    <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                      {" "}
-                    </ModuleNameAPI>
-                  }
-                >
-                  <Container
-                    height="4vw"
-                    width="25vw"
-                    borderRadius="10px"
-                    bg="#EDF6F9"
-                    padding="0.9vw 0"
-                  >
-                    <Text
-                      fontWeight="semibold"
-                      textAlign="center"
-                      fontSize="1.5vw"
-                      noOfLines={1}
-                    >
+                  <Tooltip
+                    label={
                       <ModuleNameAPI ay={element.ay} mc={element.modcode}>
                         {" "}
                       </ModuleNameAPI>
-                    </Text>
-                  </Container>
-                </Tooltip>
-
-                <Spacer />
-
-                <Tooltip label={element.createdby}>
-                  <Container
-                    height="4vw"
-                    width="20vw"
-                    borderRadius="10px"
-                    bg="#EDF6F9"
-                    padding="0.9vw 0"
-                  >
-                    <Text
-                      fontWeight="semibold"
-                      textAlign="center"
-                      fontSize="1.5vw"
-                      noOfLines={1}
-                    >
-                      {element.createdby}
-                    </Text>
-                  </Container>
-                </Tooltip>
-
-                <Spacer />
-
-                <Tooltip label={element.ay}>
-                  <Container
-                    height="4vw"
-                    width="7vw"
-                    borderRadius="10px"
-                    bg="#EDF6F9"
-                    padding="0.9vw 0"
-                  >
-                    <Text
-                      fontWeight="semibold"
-                      textAlign="center"
-                      fontSize="1.5vw"
-                    >
-                      {element.ay}
-                    </Text>
-                  </Container>
-                </Tooltip>
-
-                <Spacer />
-
-                <Tooltip label={element.term}>
-                  <Container
-                    height="4vw"
-                    width="15vw"
-                    borderRadius="10px"
-                    bg="#EDF6F9"
-                    padding="0.9vw 0"
-                  >
-                    <Text
-                      fontWeight="semibold"
-                      textAlign="center"
-                      fontSize="1.5vw"
-                    >
-                      {element.term}
-                    </Text>
-                  </Container>
-                </Tooltip>
-
-                <Spacer />
-                <Box width="3.5vw" textAlign="center" padding="0.9vw 0">
-                  <Button
-                    className="add-button"
-                    onClick={() =>
-                      handleAdd(
-                        element.modcode,
-                        element.ay,
-                        element.term,
-                        element.createdby,
-                        element.creatoruid
-                      )
                     }
-                    as={IconButton}
-                    variant="ghost"
-                    icon={
-                      <Image src={AddImage} alt="add-logo" boxSize="2.5vw" />
-                    }
-                    boxSize="2.5vw"
-                    borderWidth="0px"
-                    bg="#ffffff00"
-                    _hover={{ bg: "#ffffff00" }}
-                    _active={{
-                      bg: "#ffffff00",
-                      transform: "scale(0.98)",
-                    }}
-                    padding="0px"
-                  ></Button>
-                </Box>
+                  >
+                    <Container
+                      height="4vw"
+                      width="25vw"
+                      borderRadius="10px"
+                      bg="#EDF6F9"
+                      padding="0.9vw 0"
+                    >
+                      <Text
+                        fontWeight="semibold"
+                        textAlign="center"
+                        fontSize="1.5vw"
+                        noOfLines={1}
+                      >
+                        <ModuleNameAPI ay={element.ay} mc={element.modcode}>
+                          {" "}
+                        </ModuleNameAPI>
+                      </Text>
+                    </Container>
+                  </Tooltip>
 
-                <Spacer />
-                <Box width="6vw" textAlign="center" padding="0.8vw 0">
-                  <Button
-                    className="delete-button"
-                    onClick={() =>
-                      handleDelete(
-                        element.modcode,
-                        element.ay,
-                        element.term,
-                        element.createdby,
-                        element.creatoruid
-                      )
-                    }
-                    as={IconButton}
-                    variant="ghost"
-                    icon={<Image src={Bin} alt="bin-logo" boxSize="2.5vw" />}
-                    boxSize="2.5vw"
-                    borderWidth="0px"
-                    bg="#ffffff00"
-                    _hover={{ bg: "#ffffff00" }}
-                    _active={{
-                      bg: "#ffffff00",
-                      transform: "scale(0.98)",
-                    }}
-                    padding="0px"
-                  ></Button>
-                </Box>
-              </Flex>
+                  <Spacer />
+
+                  <Tooltip label={element.createdby}>
+                    <Container
+                      height="4vw"
+                      width="20vw"
+                      borderRadius="10px"
+                      bg="#EDF6F9"
+                      padding="0.9vw 0"
+                    >
+                      <Text
+                        fontWeight="semibold"
+                        textAlign="center"
+                        fontSize="1.5vw"
+                        noOfLines={1}
+                      >
+                        {element.createdby}
+                      </Text>
+                    </Container>
+                  </Tooltip>
+
+                  <Spacer />
+
+                  <Tooltip label={element.ay}>
+                    <Container
+                      height="4vw"
+                      width="7vw"
+                      borderRadius="10px"
+                      bg="#EDF6F9"
+                      padding="0.9vw 0"
+                    >
+                      <Text
+                        fontWeight="semibold"
+                        textAlign="center"
+                        fontSize="1.5vw"
+                      >
+                        {element.ay}
+                      </Text>
+                    </Container>
+                  </Tooltip>
+
+                  <Spacer />
+
+                  <Tooltip label={element.term}>
+                    <Container
+                      height="4vw"
+                      width="15vw"
+                      borderRadius="10px"
+                      bg="#EDF6F9"
+                      padding="0.9vw 0"
+                    >
+                      <Text
+                        fontWeight="semibold"
+                        textAlign="center"
+                        fontSize="1.5vw"
+                      >
+                        {element.term}
+                      </Text>
+                    </Container>
+                  </Tooltip>
+
+                  <Spacer />
+                  <Box width="3.5vw" textAlign="center" padding="0.9vw 0">
+                    <Button
+                      className="add-button"
+                      onClick={() =>
+                        handleAdd(
+                          element.modcode,
+                          element.ay,
+                          element.term,
+                          element.createdby,
+                          element.creatoruid
+                        )
+                      }
+                      as={IconButton}
+                      variant="ghost"
+                      icon={
+                        <Image src={AddImage} alt="add-logo" boxSize="2.5vw" />
+                      }
+                      boxSize="2.5vw"
+                      borderWidth="0px"
+                      bg="#ffffff00"
+                      _hover={{ bg: "#ffffff00" }}
+                      _active={{
+                        bg: "#ffffff00",
+                        transform: "scale(0.98)",
+                      }}
+                      padding="0px"
+                    ></Button>
+                  </Box>
+
+                  <Spacer />
+                  <Box width="6vw" textAlign="center" padding="0.8vw 0">
+                    <Button
+                      className="delete-button"
+                      onClick={() =>
+                        handleDelete(
+                          element.modcode,
+                          element.ay,
+                          element.term,
+                          element.createdby,
+                          element.creatoruid
+                        )
+                      }
+                      as={IconButton}
+                      variant="ghost"
+                      icon={<Image src={Bin} alt="bin-logo" boxSize="2.5vw" />}
+                      boxSize="2.5vw"
+                      borderWidth="0px"
+                      bg="#ffffff00"
+                      _hover={{ bg: "#ffffff00" }}
+                      _active={{
+                        bg: "#ffffff00",
+                        transform: "scale(0.98)",
+                      }}
+                      padding="0px"
+                    ></Button>
+                  </Box>
+                </Flex>
+              </>
             ))}
+
         </GridItem>
       </Grid>
     </div>

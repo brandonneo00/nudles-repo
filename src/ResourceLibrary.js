@@ -180,6 +180,7 @@ function ResourceLibrary() {
                   placeholder="E.g. CS1101S"
                   onChange={(e) => setModuleCode(e.target.value)}
                   value={modulecode.toUpperCase()}
+                  fontSize="1.2vw"
                 />
 
                 <Box>
@@ -193,7 +194,7 @@ function ResourceLibrary() {
                     ACADEMIC YEAR
                   </Text>
                 </Box>
-                <Field
+                {/* <Field
                   as={Input}
                   id="modulecode"
                   name="academic year"
@@ -203,7 +204,25 @@ function ResourceLibrary() {
                   placeholder="E.g. 21-22"
                   onChange={(e) => setAcademicYear(e.target.value)}
                   value={academicyear}
-                />
+                /> */}
+
+                {/* new dropdown for the searches */}
+                <Select
+                  variant="filled"
+                  placeholder="Academic Year"
+                  width="10vw"
+                  onChange={(e) => setAcademicYear(e.target.value)}
+                  value={academicyear}
+                  height="2vw"
+                  fontSize="1.2vw"
+                  iconSize="1vw"
+                  isRequired
+                >
+                  <option>20-21</option>
+                  <option>21-22</option>
+                  <option>22-23</option>
+                  
+                </Select>
 
                 <Select
                   variant="filled"
@@ -259,13 +278,15 @@ function ResourceLibrary() {
             alignItems="center"
             justifyContent="center"
             textAlign="center"
-            fontSize="md"
+            fontSize="1vw"
             margin="0% 2%"
+            height="3vw"
+
           >
-            <AlertIcon />
+            <AlertIcon boxSize="1vw"/>
             <AlertTitle>Error: </AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
+        </Alert>
         )}
       </Center>
 

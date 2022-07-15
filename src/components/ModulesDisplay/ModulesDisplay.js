@@ -1,13 +1,11 @@
-import TopBarV2 from "./components/TopBarV2";
 import { Box, HStack, Text, Tooltip, VStack, SimpleGrid } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { db } from "./firebase/config";
+import { db } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
-import { useAuthContext } from "./hooks/useAuthContext";
+import { useAuthContext } from "../../hooks/useAuthContext";
 import { useState, useEffect } from "react";
-import ModulesDisplay from "./components/ModulesDisplay";
 
-function ModuleSelection() {
+function ModulesDisplay() {
   const { user } = useAuthContext();
   const [buttonclick, setButtonClick] = useState(false);
   const [likedArray, setLikedArray] = useState("");
@@ -56,9 +54,7 @@ function ModuleSelection() {
 
   return (
     <div>
-      <TopBarV2 />
-      <ModulesDisplay />
-      {/* <Box margin="3% 4% 0%">
+      <Box margin="3% 4% 0%">
         <Box marginBottom="2vw" alignItems="left">
           <HStack spacing="3vw">
             <Text
@@ -183,9 +179,9 @@ function ModuleSelection() {
               </Link>
             ))}
         </SimpleGrid>   
-      </Box> */}
+      </Box>
     </div>
   );
 }
 
-export default ModuleSelection;
+export default ModulesDisplay;

@@ -11,6 +11,8 @@ import { useAuthContext } from "./hooks/useAuthContext";
 
 import UserDetail from "./UserDetail";
 
+import ModulesDisplay from "./components/ModulesDisplay";
+
 function MotivationalQuote() {
   const [quote, setQuote] = useState("Loading Motivational Quote.....");
   useEffect(() => {
@@ -80,8 +82,8 @@ function Welcome() {
           "<MotivationalQuote></MotivationalQuote>"
         </Text>
       </Center>
-      <div className="module-page">
-      
+
+      <Box marginBottom="5vw">
         <Center>
           <Box
             className="dotted-box"
@@ -92,8 +94,10 @@ function Welcome() {
             margin="8%"
           ></Box>
         </Center>
-        
-        <Box padding="5%">
+        <ModulesDisplay />
+          
+
+        {/* <Box padding="5%">
           <Text
             fontSize="48px"
             fontWeight="semibold"
@@ -115,8 +119,8 @@ function Welcome() {
               (MODULES ADDED)
             </Text>
           </Center>
-        </Box>
-      </div>
+        </Box> */}
+      </Box>
     </>
   );
 }

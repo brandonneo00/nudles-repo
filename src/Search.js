@@ -54,8 +54,10 @@ function Search() {
   const [success, setSuccess] = useState(false);
   const { user } = useAuthContext();
   const [deleted, setDeleted] = useState(false);
+  const [tempName, setTempName] = useState("");
 
   var helper = [];
+  var helper2 = []; //16 july
 
   function checkSearchError(acadYear) {
     if (
@@ -151,6 +153,10 @@ function Search() {
     //If empty/not inside then we add
     setAdded(true);
   };
+  
+  useEffect(() => {
+    
+  }, [resArray]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -158,6 +164,7 @@ function Search() {
     setError("");
     setAdded(false);
     setDeleted(false);
+    //
 
     try {
       checkSearchError(academicyear);
@@ -178,11 +185,14 @@ function Search() {
       var uniqueSet = new Set();
       var hasEntered = false;
 
+      
       qn_querySnapshot.forEach((docs) => {
         hasEntered = true;
 
         if (!uniqueSet.has(docs.data().uid)) {
           uniqueSet.add(docs.data().uid);
+          console.log(uniqueSet.size + " unique set length")
+          setTempName(uniqueSet);
 
           const userRef = collection(db, "userprofiles");
 
@@ -192,9 +202,13 @@ function Search() {
           );
 
           let nameHolder;
+
           const snapShot1 = async () => {
+            console.log("into snapShot1")
             const qUserRef = await getDocs(queryUserRef);
             qUserRef.forEach((file) => (nameHolder = file.data().username));
+            const modulename = await getModuleName();
+            console.log("module name in snapShot1 is " + modulename);
 
             helper.push({
               modcode: docs.data().module,
@@ -202,9 +216,33 @@ function Search() {
               ay: docs.data().academicyear,
               term: docs.data().term,
               creatoruid: docs.data().uid,
+              modulename: modulename,
             });
-
+            console.log("helper[] length: " + helper.length + " helper[]: " + helper);
+            console.log("setting resarray")
             setResArray(helper);
+            console.log(resArray + " is resarray usestate")
+          };
+
+          const getModuleName = async () => {
+            const documentRef = doc(
+              db,
+              "modules",
+              docs.data().module,
+              docs.data().academicyear,
+              docs.data().term
+            );
+
+            const documentSnap = await getDoc(documentRef);
+
+            if (documentSnap.exists()) {
+              console.log(
+                documentSnap.data()[docs.data().uid] + " is the fieldname in getModuleName"
+              );
+              return documentSnap.data()[docs.data().uid];
+            } else {
+              console.log("No such document!");
+            }
           };
 
           snapShot1();
@@ -215,9 +253,12 @@ function Search() {
         throw Error("Sorry! No such module created yet!");
       }
 
+      console.log("came here")
+
       setModuleCode("");
       setAcademicYear("");
       setTerm("");
+      console.log("done resetting")
     } catch (e) {
       setError(e);
       console.error(e);
@@ -228,27 +269,49 @@ function Search() {
     return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
   }
 
-  function ModuleNameAPI(props) {
-    const nusmodsAPI =
-      "https://api.nusmods.com/v2/" +
-      formatYear(props.ay) +
-      "/modules/" +
-      props.mc +
-      ".json";
-    const [moduleName, setModuleName] = useState("");
-    useEffect(() => {
-      fetch(nusmodsAPI)
-        .then((response) => response.json())
-        .then((data) => setModuleName(data.title))
-        .catch((error) =>
-          setModuleName(`Unable to retrieve Module Name: ${error}`)
-        );
-    }, []);
+  // function ModuleNameAPI(props) {
+  //   const nusmodsAPI =
+  //     "https://api.nusmods.com/v2/" +
+  //     formatYear(props.ay) +
+  //     "/modules/" +
+  //     props.mc +
+  //     ".json";
+  //   const [moduleName, setModuleName] = useState("");
+  //   useEffect(() => {
+  //     fetch(nusmodsAPI)
+  //       .then((response) => response.json())
+  //       .then((data) => setModuleName(data.title))
+  //       .catch((error) =>
+  //         setModuleName(`Unable to retrieve Module Name: ${error}`)
+  //       );
+  //   }, []);
 
-    return moduleName;
-  }
+  //   return moduleName;
+  // }
 
-  return ( 
+  //   const [tempname, setTempName] = useState("")
+  //   const getModuleName = async (mc, ay, term, creatoruid) => {
+  //     const documentRef = doc(db,
+  //       "modules",
+  //       mc,
+  //       ay,
+  //       term);
+
+  //     const documentSnap = await getDoc(documentRef);
+
+  // if (documentSnap.exists()) {
+  //   console.log(documentSnap.data() + " this is document data")
+  //   console.log(documentSnap.data()[creatoruid] + " this is field name")
+  //   // const fieldName = user.uid;
+  //   setTempName(documentSnap.data()[creatoruid])
+  //   // return documentSnap.data()[creatoruid];
+  // } else {
+  //   console.log("No such document!");
+  // }
+
+  // }
+
+  return (
     <div className="searchdiv">
       <TopBarV2 />
       <Formik>
@@ -367,10 +430,9 @@ function Search() {
         </form>
       </Formik>
 
-
       <Center marginTop="1rem">
-        {error ? 
-        (<Alert
+        {error ? (
+          <Alert
             status="error"
             alignItems="center"
             justifyContent="center"
@@ -378,14 +440,12 @@ function Search() {
             fontSize="1vw"
             margin="0% 2%"
             height="3vw"
-
           >
-            <AlertIcon boxSize="1vw"/>
+            <AlertIcon boxSize="1vw" />
             <AlertTitle>Error: </AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
-        </Alert>)
-        : deleted
-        ? (
+          </Alert>
+        ) : deleted ? (
           <Alert
             alignItems="center"
             justifyContent="center"
@@ -397,12 +457,11 @@ function Search() {
           >
             <AlertIcon boxSize="1vw" />
             <AlertTitle>Module Deleted! </AlertTitle>
-            <AlertDescription>Deleted from your favourite list!</AlertDescription>
-            
+            <AlertDescription>
+              Deleted from your favourite list!
+            </AlertDescription>
           </Alert>
-        )
-        : added
-        ? (
+        ) : added ? (
           <Alert
             alignItems="center"
             justifyContent="center"
@@ -414,13 +473,11 @@ function Search() {
           >
             <AlertIcon boxSize="1vw" />
             <AlertTitle>Module Added! </AlertTitle>
-            <AlertDescription>Successfully added to your favourite list!</AlertDescription>
-            
+            <AlertDescription>
+              Successfully added to your favourite list!
+            </AlertDescription>
           </Alert>
-        )
-        :null
-          
-        }
+        ) : null}
       </Center>
 
       <Grid minHeight="40vw">
@@ -516,10 +573,14 @@ function Search() {
             </Box>
           </Flex>
 
+          
           {resArray &&
             resArray.map((element, index) => (
               <div key={index}>
-                <Flex key={index} marginBottom="1vw">
+              {console.log("current index is " + index)}
+              {console.log(resArray.length + " length of array")}
+              {console.log(resArray + " this is resarray in map")}
+                <Flex marginBottom="1vw">
                   <Tooltip label={element.modcode}>
                     <Container
                       height="4vw"
@@ -542,9 +603,10 @@ function Search() {
 
                   <Tooltip
                     label={
-                      <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                        {" "}
-                      </ModuleNameAPI>
+                      // <ModuleNameAPI ay={element.ay} mc={element.modcode}>
+                      //   {" "}
+                      // </ModuleNameAPI>
+                      element.modulename
                     }
                   >
                     <Container
@@ -560,9 +622,10 @@ function Search() {
                         fontSize="1.5vw"
                         noOfLines={1}
                       >
-                        <ModuleNameAPI ay={element.ay} mc={element.modcode}>
+                        {/* <ModuleNameAPI ay={element.ay} mc={element.modcode}>
                           {" "}
-                        </ModuleNameAPI>
+                        </ModuleNameAPI> */}
+                        {element.modulename}
                       </Text>
                     </Container>
                   </Tooltip>
@@ -688,7 +751,6 @@ function Search() {
                 </Flex>
               </div>
             ))}
-
         </GridItem>
       </Grid>
     </div>

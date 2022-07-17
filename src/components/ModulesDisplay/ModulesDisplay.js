@@ -45,6 +45,8 @@ function ModulesDisplay() {
       setLikedArray(helperArr);
     }
 
+    // If document does not exist means new user or user has not added any modules -->
+
     if (buttonclick) {
       setButtonClick(false);
     } else {

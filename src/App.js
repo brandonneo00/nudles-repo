@@ -18,6 +18,7 @@ import UpdateProfile from "./UpdateProfile";
 import ModuleSelection from "./ModuleSelection";
 import CompiledQuestions from "./CompiledQuestions";
 import Ranking from "./Ranking";
+import UpdateInputQuestion from "./UpdateInputQuestion";
 
 function App() {
   const { user, authIsReady } = useAuthContext();
@@ -53,10 +54,10 @@ function App() {
               {user && <ResourceLibrary />}
               {!user && <Redirect to="/" />}
             </Route>
-            <Route exact path="/InputQuestion">
+            {/* <Route exact path="/InputQuestion">
               {user && <InputQuestion />}
               {!user && <Redirect to="/" />}
-            </Route>
+            </Route> */}
             <Route exact path="/Leaderboard">
               {user && <Leaderboard />}
               {!user && <Redirect to="/" />}
@@ -82,6 +83,10 @@ function App() {
             </Route>
             <Route exact path="/Ranking">
               {user && <Ranking />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            <Route exact path="/InputQuestion">
+              {user && <UpdateInputQuestion />}
               {!user && <Redirect to="/" />}
             </Route>
           </Switch>

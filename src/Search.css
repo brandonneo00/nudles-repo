@@ -3,6 +3,7 @@
 .searchdiv{ 
     /* background-image: url("./images/search-background.png"); */
     /* background-image: url("./images/background1.jpeg"); */
-    background-image: url("./images/background.png");
+    background-image: url("./images/background-search.png");
     height: 100vh;
+    background-size: 100vw;
 }

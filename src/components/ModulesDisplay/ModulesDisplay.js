@@ -1,9 +1,19 @@
-import { Box, HStack, Text, Tooltip, VStack, SimpleGrid } from "@chakra-ui/react";
+import {
+  Box,
+  HStack,
+  Text,
+  Tooltip,
+  VStack,
+  SimpleGrid,
+  Image,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase/config";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import { useState, useEffect } from "react";
+import deleteButton from "../../images/bin.png";
+import _ from "lodash";
 
 function ModulesDisplay() {
   const { user } = useAuthContext();
@@ -11,36 +21,37 @@ function ModulesDisplay() {
   const [likedArray, setLikedArray] = useState("");
 
   var helperArr = [];
+  var newArr = [];
+  // function formatYear(acadyear) {
+  //   return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
+  // }
 
-  function formatYear(acadyear) {
-    return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
-  }
+  // function ModuleNameAPI(props) {
+  //   const nusmodsAPI =
+  //     "https://api.nusmods.com/v2/" +
+  //     formatYear(props.ay) +
+  //     "/modules/" +
+  //     props.mc +
+  //     ".json";
+  //   const [moduleName, setModuleName] = useState("");
+  //   useEffect(() => {
+  //     fetch(nusmodsAPI)
+  //       .then((response) => response.json())
+  //       .then((data) => setModuleName(data.title))
+  //       .catch((error) =>
+  //         setModuleName(`Unable to retrieve Module Name: ${error}`)
+  //       );
+  //   }, []);
 
-  function ModuleNameAPI(props) {
-    const nusmodsAPI =
-      "https://api.nusmods.com/v2/" +
-      formatYear(props.ay) +
-      "/modules/" +
-      props.mc +
-      ".json";
-    const [moduleName, setModuleName] = useState("");
-    useEffect(() => {
-      fetch(nusmodsAPI)
-        .then((response) => response.json())
-        .then((data) => setModuleName(data.title))
-        .catch((error) =>
-          setModuleName(`Unable to retrieve Module Name: ${error}`)
-        );
-    }, []);
-
-    return moduleName;
-  }
+  //   return moduleName;
+  // }
 
   const handleClick = async () => {
     const docRef = doc(db, "likedmodules", user.uid);
     const docSnap = await getDoc(docRef);
     setLikedArray("");
     if (docSnap.exists()) {
+      console.log("document exist");
       helperArr = docSnap.data().modarray;
       setLikedArray(helperArr);
     }
@@ -51,6 +62,39 @@ function ModulesDisplay() {
       setButtonClick(false);
     } else {
       setButtonClick(true);
+    }
+  };
+
+  const handleDelete = async (ay, creatoruid, creatorusername, modcode, modname, term) => {
+    const ref = doc(db, "likedmodules", user.uid);
+    const refSnap = await getDoc(ref);
+    const target = {
+      academicyear: ay,
+      creatoruid: creatoruid,
+      creatorusername: creatorusername,
+      modulecode: modcode,
+      modulename: modname,
+      term: term,
+    };
+    if (refSnap.exists()) {
+      newArr = refSnap.data().modarray;
+      var res = [];
+
+      for (let i = 0; i < newArr.length; i++) {
+        if (!_.isEqual(newArr[i], target)) {
+          res.push(newArr[i]);
+        }
+      }
+    // for (let i = 0; i < newArr.length; i++) {
+      //   //do something
+      //   if (_.isEqual(newArr[i], target)) {
+      //     delete newArr[i];
+      //     console.log("deleted");
+      //     break;
+      //   }
+      // }  
+      setLikedArray(res);
+      await setDoc(ref, { modarray: res });
     }
   };
 
@@ -70,7 +114,7 @@ function ModulesDisplay() {
             </Text>
             <Box
               as="button"
-              height="2.5vw"
+              height="3vw"
               lineHeight="1.2"
               transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
               border="0px"
@@ -98,89 +142,161 @@ function ModulesDisplay() {
           </HStack>
         </Box>
 
-       <SimpleGrid columns={4} spacing="4vw">
-          {buttonclick &&
-            likedArray.map((obj, index) => (
-              <Link
-                to={{
-                  pathname: "/Play",
-                  state: { obj: obj },
-                }}
-                key={index}
+        {buttonclick ? (
+          likedArray.toString() !== "" ? (
+            <SimpleGrid columns={4} spacing="3vw">
+              {likedArray.map((obj, index) => (
+                <HStack spacing="0" key={index}>
+                  <Link
+                    to={{
+                      pathname: "/Play",
+                      state: { obj: obj },
+                    }}
+                  >
+                    <Box
+                      as="button"
+                      key={index}
+                      // borderRadius="15px"
+                      borderLeftRadius="15px"
+                      borderRightRadius="0px"
+                      width="18vw"
+                      height="8.333vw"
+                      bg="#E5E5E5"
+                      _hover={{ bg: "#C7C7C7" }}
+                      _active={{
+                        bg: "#E5E5E5",
+                        transform: "scale(0.98)",
+                        borderColor: "",
+                      }}
+                      _focus={{
+                        boxShadow:
+                          "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+                      }}
+                    >
+                      <Text
+                        fontSize="1.042vw"
+                        fontWeight="semibold"
+                        color="#686B6F"
+                        align="left"
+                        margin="1% 5% 0%"
+                      >
+                        {obj.modulecode}
+                      </Text>
+                      <Tooltip label={obj.modulename} placement="bottom-start">
+                        <Text
+                          fontSize="1.250vw"
+                          fontWeight="semibold"
+                          color="#000000"
+                          align="left"
+                          margin="0% 5% 3%"
+                          noOfLines={1}
+                        >
+                          {obj.modulename}
+                        </Text>
+                      </Tooltip>
+                      <Text
+                        fontSize="1.042vw"
+                        fontWeight="semibold"
+                        color="#686B6F"
+                        align="left"
+                        margin="0% 5%"
+                      >
+                        {"AY " + obj.academicyear + " " + obj.term}
+                      </Text>
+                      <Tooltip
+                        label={obj.creatorusername}
+                        placement="bottom-start"
+                      >
+                        <Text
+                          fontSize="1.042vw"
+                          fontWeight="semibold"
+                          color="#686B6F"
+                          align="left"
+                          margin="0% 5%"
+                          noOfLines={1}
+                        >
+                          {obj.creatorusername}
+                        </Text>
+                      </Tooltip>
+                    </Box>
+                  </Link>
+                  <Box
+                    as="button"
+                    height="8.333vw"
+                    lineHeight="1.2"
+                    transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+                    border="0px"
+                    borderRightRadius="15px"
+                    borderLeftRadius="0px"
+                    fontSize="1.2vw"
+                    fontWeight="semibold"
+                    bg="#FFD8D8"
+                    borderColor=""
+                    color="#000000"
+                    _hover={{ bg: "#EDC9C9" }}
+                    _active={{
+                      bg: "#FFD8D8",
+                      transform: "scale(0.98)",
+                      borderColor: "",
+                    }}
+                    _focus={{
+                      boxShadow:
+                        "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+                    }}
+                    padding="0.3vw"
+                    onClick={() => {handleDelete(obj.academicyear, obj.creatoruid, obj.creatorusername, obj.modulecode, obj.modulename, obj.term)}}
+                  >
+                    <Image
+                      src={deleteButton}
+                      alt="Delete-button"
+                    />
+                  </Box>
+                </HStack>
+              ))}
+            </SimpleGrid>
+          ) : (
+            <Box textAlign="left">
+              <Text
+                fontSize="2vw"
+                fontWeight="normal"
+                color="#000000"
+                lineHeight="1.3"
+                align="left"
+                marginBottom="1vw"
               >
+                Please Start By Adding Modules
+              </Text>
+
+              <Link to="Search">
                 <Box
                   as="button"
-                  key={index}
-                  borderRadius="15px"
-                  width="18.594vw"
-                  height="8.333vw"
-                  bg="#E5E5E5"
-                  _hover={{ bg: "#C7C7C7" }}
+                  height="3vw"
+                  lineHeight="1.2"
+                  transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+                  border="0px"
+                  width="10vw"
+                  borderRadius="10px"
+                  fontSize="1.2vw"
+                  fontWeight="semibold"
+                  bg="#83C5BE"
+                  borderColor="#ccd0d5"
+                  color="#000000"
+                  _hover={{ bg: "#63B7AE" }}
                   _active={{
-                    bg: "#E5E5E5",
+                    bg: "#dddfe2",
                     transform: "scale(0.98)",
-                    borderColor: "",
                   }}
                   _focus={{
                     boxShadow:
                       "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
                   }}
                 >
-                  <Text
-                    fontSize="1.042vw"
-                    fontWeight="semibold"
-                    color="#686B6F"
-                    align="left"
-                    margin="1% 5% 0%"
-                  >
-                    {obj.modulecode}
-                  </Text>
-                  <Tooltip
-                    label={
-                      <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
-                        {" "}
-                      </ModuleNameAPI>
-                    }
-                    placement="bottom-start"
-                  >
-                    <Text
-                      fontSize="1.250vw"
-                      fontWeight="semibold"
-                      color="#000000"
-                      align="left"
-                      margin="0% 5% 3%"
-                      noOfLines={1}
-                    >
-                      <ModuleNameAPI ay={obj.academicyear} mc={obj.modulecode}>
-                        {" "}
-                      </ModuleNameAPI>
-                    </Text>
-                  </Tooltip>
-                  <Text
-                    fontSize="1.042vw"
-                    fontWeight="semibold"
-                    color="#686B6F"
-                    align="left"
-                    margin="0% 5%"
-                  >
-                    {"AY " + obj.academicyear + " " + obj.term}
-                  </Text>
-                  <Tooltip label={obj.creatorusername} placement="bottom-start">
-                    <Text
-                      fontSize="1.042vw"
-                      fontWeight="semibold"
-                      color="#686B6F"
-                      align="left"
-                      margin="0% 5%"
-                      noOfLines={1}
-                    >
-                      {obj.creatorusername}
-                    </Text>
-                  </Tooltip>
+                  Start Here
                 </Box>
               </Link>
-            ))}
-        </SimpleGrid>   
+            </Box>
+          )
+        ) : null}
       </Box>
     </div>
   );

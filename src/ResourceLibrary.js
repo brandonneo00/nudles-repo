@@ -37,7 +37,7 @@ import {
 
 // importing our firestore database object
 import { db } from "./firebase/config";
-import "./Search.css";
+import "./ResourceLibrary.css";
 
 function ResourceLibrary() {
   const [modulecode, setModuleCode] = useState("");
@@ -152,7 +152,7 @@ function ResourceLibrary() {
   };
 
   return (
-    <div>
+    <div className="resourcediv">
       <TopBarV2 />
       <Formik>
         <form onSubmit={handleSubmit}>
@@ -175,7 +175,7 @@ function ResourceLibrary() {
                   id="modulecode"
                   name="modulecode"
                   variant="filled"
-                  width="9vw"
+                  width="10vw"
                   height="1.875vw"
                   placeholder="E.g. CS1101S"
                   onChange={(e) => setModuleCode(e.target.value)}
@@ -183,7 +183,7 @@ function ResourceLibrary() {
                   fontSize="1.2vw"
                 />
 
-                <Box>
+                {/* <Box>
                   <Text
                     fontSize="1.5vw"
                     fontWeight="semibold"
@@ -193,7 +193,7 @@ function ResourceLibrary() {
                   >
                     ACADEMIC YEAR
                   </Text>
-                </Box>
+                </Box> */}
                 {/* <Field
                   as={Input}
                   id="modulecode"
@@ -210,7 +210,7 @@ function ResourceLibrary() {
                 <Select
                   variant="filled"
                   placeholder="Academic Year"
-                  width="10vw"
+                  width="12vw"
                   onChange={(e) => setAcademicYear(e.target.value)}
                   value={academicyear}
                   height="2vw"
@@ -227,7 +227,7 @@ function ResourceLibrary() {
                 <Select
                   variant="filled"
                   placeholder="Term"
-                  width="8.333vw"
+                  width="12vw"
                   onChange={(e) => setTerm(e.target.value)}
                   value={term}
                   height="2vw"
@@ -292,7 +292,7 @@ function ResourceLibrary() {
 
 
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%">
+        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%" opacity="0.9">
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text

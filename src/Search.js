@@ -54,11 +54,9 @@ function Search() {
   const [success, setSuccess] = useState(false);
   const { user } = useAuthContext();
   const [deleted, setDeleted] = useState(false);
-  const [tempName, setTempName] = useState("");
+  const [tempSet, setTempSet] = useState("");
 
   var helper = [];
-  var helper2 = []; //16 july
-
   function checkSearchError(acadYear) {
     if (
       acadYear.includes("/") ||
@@ -77,7 +75,8 @@ function Search() {
     academicYear,
     term,
     creatorUsername,
-    creatorUID
+    creatorUID,
+    modulename
   ) => {
     setDeleted(false);
     setAdded(false);
@@ -87,6 +86,7 @@ function Search() {
       term: term,
       creatorusername: creatorUsername,
       creatoruid: creatorUID,
+      modulename: modulename
     };
 
     const docRef = doc(db, "likedmodules", user.uid);
@@ -111,7 +111,8 @@ function Search() {
     academicYear,
     term,
     creatorUsername,
-    creatorUID
+    creatorUID,
+    modulename
   ) => {
     setAdded(false);
     setDeleted(false);
@@ -121,6 +122,7 @@ function Search() {
       term: term,
       creatorusername: creatorUsername,
       creatoruid: creatorUID,
+      modulename: modulename
     };
 
     //Get modArray data from the likedmodules collection
@@ -153,10 +155,8 @@ function Search() {
     //If empty/not inside then we add
     setAdded(true);
   };
-  
-  useEffect(() => {
-    
-  }, [resArray]);
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -185,14 +185,14 @@ function Search() {
       var uniqueSet = new Set();
       var hasEntered = false;
 
-      
       qn_querySnapshot.forEach((docs) => {
         hasEntered = true;
 
         if (!uniqueSet.has(docs.data().uid)) {
           uniqueSet.add(docs.data().uid);
-          console.log(uniqueSet.size + " unique set length")
-          setTempName(uniqueSet);
+          console.log(uniqueSet.size + " unique set length");
+          setTempSet(uniqueSet);
+        
 
           const userRef = collection(db, "userprofiles");
 
@@ -253,63 +253,19 @@ function Search() {
         throw Error("Sorry! No such module created yet!");
       }
 
-      console.log("came here")
+      console.log("came here");
 
       setModuleCode("");
       setAcademicYear("");
       setTerm("");
-      console.log("done resetting")
+      console.log("done resetting");
     } catch (e) {
       setError(e);
       console.error(e);
     }
   };
 
-  function formatYear(acadyear) {
-    return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
-  }
 
-  // function ModuleNameAPI(props) {
-  //   const nusmodsAPI =
-  //     "https://api.nusmods.com/v2/" +
-  //     formatYear(props.ay) +
-  //     "/modules/" +
-  //     props.mc +
-  //     ".json";
-  //   const [moduleName, setModuleName] = useState("");
-  //   useEffect(() => {
-  //     fetch(nusmodsAPI)
-  //       .then((response) => response.json())
-  //       .then((data) => setModuleName(data.title))
-  //       .catch((error) =>
-  //         setModuleName(`Unable to retrieve Module Name: ${error}`)
-  //       );
-  //   }, []);
-
-  //   return moduleName;
-  // }
-
-  //   const [tempname, setTempName] = useState("")
-  //   const getModuleName = async (mc, ay, term, creatoruid) => {
-  //     const documentRef = doc(db,
-  //       "modules",
-  //       mc,
-  //       ay,
-  //       term);
-
-  //     const documentSnap = await getDoc(documentRef);
-
-  // if (documentSnap.exists()) {
-  //   console.log(documentSnap.data() + " this is document data")
-  //   console.log(documentSnap.data()[creatoruid] + " this is field name")
-  //   // const fieldName = user.uid;
-  //   setTempName(documentSnap.data()[creatoruid])
-  //   // return documentSnap.data()[creatoruid];
-  // } else {
-  //   console.log("No such document!");
-  // }
-
-  // }
 
   return (
     <div className="searchdiv">
@@ -335,7 +291,7 @@ function Search() {
                   id="modulecode"
                   name="modulecode"
                   variant="filled"
-                  width="9vw"
+                  width="10vw"
                   height="1.875vw"
                   placeholder="E.g. CS1101S"
                   onChange={(e) => setModuleCode(e.target.value)}
@@ -343,7 +299,7 @@ function Search() {
                   fontSize="1.2vw"
                 />
 
-                <Box>
+                {/* <Box>
                   <Text
                     fontSize="1.5vw"
                     fontWeight="semibold"
@@ -353,7 +309,8 @@ function Search() {
                   >
                     ACADEMIC YEAR
                   </Text>
-                </Box>
+                </Box> */}
+
                 {/* <Field
                   as={Input}
                   id="modulecode"
@@ -370,7 +327,7 @@ function Search() {
                 <Select
                   variant="filled"
                   placeholder="Academic Year"
-                  width="10vw"
+                  width="12vw"
                   onChange={(e) => setAcademicYear(e.target.value)}
                   value={academicyear}
                   height="2vw"
@@ -386,7 +343,7 @@ function Search() {
                 <Select
                   variant="filled"
                   placeholder="Term"
-                  width="8.333vw"
+                  width="12vw"
                   onChange={(e) => setTerm(e.target.value)}
                   value={term}
                   height="2vw"
@@ -486,6 +443,7 @@ function Search() {
           borderRadius="15px"
           margin="1% 2% 2%"
           padding="1.5%"
+          opacity="0.9"
         >
           <Flex marginBottom="1vw">
             <Box width="12vw">
@@ -573,13 +531,12 @@ function Search() {
             </Box>
           </Flex>
 
-          
           {resArray &&
             resArray.map((element, index) => (
               <div key={index}>
-              {console.log("current index is " + index)}
-              {console.log(resArray.length + " length of array")}
-              {console.log(resArray + " this is resarray in map")}
+                {console.log("current index is " + index)}
+                {console.log(resArray.length + " length of array")}
+                {console.log(resArray + " this is resarray in map")}
                 <Flex marginBottom="1vw">
                   <Tooltip label={element.modcode}>
                     <Container
@@ -701,7 +658,8 @@ function Search() {
                           element.ay,
                           element.term,
                           element.createdby,
-                          element.creatoruid
+                          element.creatoruid,
+                          element.modulename
                         )
                       }
                       as={IconButton}
@@ -731,7 +689,8 @@ function Search() {
                           element.ay,
                           element.term,
                           element.createdby,
-                          element.creatoruid
+                          element.creatoruid,
+                          element.modulename
                         )
                       }
                       as={IconButton}

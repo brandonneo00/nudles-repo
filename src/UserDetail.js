@@ -1,3 +1,3 @@
 export default function UserDetail({ userprofiles }) {
-  return <div>{userprofiles.map((userprofile) => userprofile.username)}</div>;
+  return <>{userprofiles.map((userprofile) => userprofile.username)}</>;
 }

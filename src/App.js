@@ -19,6 +19,8 @@ import ModuleSelection from "./ModuleSelection";
 import CompiledQuestions from "./CompiledQuestions";
 import Ranking from "./Ranking";
 import UpdateInputQuestion from "./UpdateInputQuestion";
+import Profile from "./Profile";
+import CompiledQuestionsV2 from "./CompiledQuestionsV2";
 
 function App() {
   const { user, authIsReady } = useAuthContext();
@@ -77,16 +79,25 @@ function App() {
               {user && <ModuleSelection />}
               {!user && <Redirect to="/" />}
             </Route>
-            <Route exact path="/CompiledQuestions">
+            {/* <Route exact path="/CompiledQuestions">
               {user && <CompiledQuestions />}
               {!user && <Redirect to="/" />}
-            </Route>
+            </Route> */}
             <Route exact path="/Ranking">
               {user && <Ranking />}
               {!user && <Redirect to="/" />}
             </Route>
             <Route exact path="/InputQuestion">
               {user && <UpdateInputQuestion />}
+              {!user && <Redirect to="/" />}
+            </Route>
+            {/* <Route exact path="/Profile">
+              {user && <Profile />}
+              {!user && <Redirect to="/" />}
+            </Route> */}
+
+            <Route exact path="/CompiledQuestions">
+              {user && <CompiledQuestionsV2 />}
               {!user && <Redirect to="/" />}
             </Route>
           </Switch>

@@ -1,0 +1,55 @@
+/* @media all {
+    .page-break {
+      display: none;
+    }
+  }
+  
+  @media print {
+    html, body {
+      height: initial !important;
+      overflow: initial !important;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+  
+  @media print {
+    .page-break {
+      margin-top: 1rem;
+      display: block;
+      page-break-before: auto;
+    }
+  }
+  
+  @page {
+    size: auto;
+    margin: 20mm;
+  } */
+@media print {
+  .pagebreak {
+    page-break-before: always;
+  } /* page-break-after works, as well */
+}
+
+@media print {
+  .spacing {
+    height: 5vw;
+  }
+}
+
+@media print {
+    .notes span{
+      /* content: "Insert Notes";
+      font-size: 10px;
+      font-weight: bold;
+      color: red; */
+      display: none;
+    }
+    .notes:after{
+        content: "Insert Notes Here: ";
+        font-size: 24px;
+        font-weight: bold;
+        font-style: italic;
+        color: rgb(156, 156, 156);
+    }
+
+  }

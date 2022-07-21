@@ -24,6 +24,7 @@ import {
   AlertIcon,
   AlertDescription,
   AlertTitle,
+  Spinner
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 
@@ -53,7 +54,7 @@ function Search() {
   const [added, setAdded] = useState(false);
   const { user } = useAuthContext();
   const [deleted, setDeleted] = useState(false);
-  const [tempSet, setTempSet] = useState("");
+  const [stillsearching, setStillSearching] = useState("hidden");
 
   var helper = [];
   function checkSearchError(acadYear) {
@@ -161,7 +162,7 @@ function Search() {
     setError("");
     setAdded(false);
     setDeleted(false);
-    //
+    setStillSearching("visible");
 
     try {
       checkSearchError(academicyear);
@@ -181,73 +182,60 @@ function Search() {
 
       var uniqueSet = new Set();
       var hasEntered = false;
+      var arrayOfDocs = [];
 
       qn_querySnapshot.forEach((docs) => {
         hasEntered = true;
-
         if (!uniqueSet.has(docs.data().uid)) {
           uniqueSet.add(docs.data().uid);
-          console.log(uniqueSet.size + " unique set length");
-          setTempSet(uniqueSet);
-
-          const userRef = collection(db, "userprofiles");
-
-          const queryUserRef = query(
-            userRef,
-            where("uid", "==", docs.data().uid)
-          );
-
-          let nameHolder;
-
-          const snapShot1 = async () => {
-            console.log("into snapShot1");
-            const qUserRef = await getDocs(queryUserRef);
-            qUserRef.forEach((file) => (nameHolder = file.data().username));
-            const modulename = await getModuleName();
-            console.log("module name in snapShot1 is " + modulename);
-
-            helper.push({
-              modcode: docs.data().module,
-              createdby: nameHolder,
-              ay: docs.data().academicyear,
-              term: docs.data().term,
-              creatoruid: docs.data().uid,
-              modulename: modulename,
-            });
-            console.log(
-              "helper[] length: " + helper.length + " helper[]: " + helper
-            );
-            // console.log("setting resarray");
-            setResArray(helper);
-            // console.log(resArray + " is resarray usestate");
-            console.log("snapshot finished")
-          };
-
-          const getModuleName = async () => {
-            const documentRef = doc(
-              db,
-              "modules",
-              docs.data().module,
-              docs.data().academicyear,
-              docs.data().term
-            );
-
-            const documentSnap = await getDoc(documentRef);
-
-            if (documentSnap.exists()) {
-              console.log(
-                documentSnap.data()[docs.data().uid] +
-                  " is the fieldname in getModuleName"
-              );
-              return documentSnap.data()[docs.data().uid];
-            } else {
-              console.log("No such document!");
-            }
-          };
-
-          snapShot1();
+          arrayOfDocs.push(docs.data());
         }
       });
+
+      const userRef = collection(db, "userprofiles");
+
+      for (let i = 0; i < arrayOfDocs.length; i++) {
+        let nameHolder;
+        let modulename;
+        const queryUserRef = query(
+          userRef,
+          where("uid", "==", arrayOfDocs[i].uid)
+        );
+        const qUserRef = await getDocs(queryUserRef);
+        qUserRef.forEach((file) => (nameHolder = file.data().username));
+
+        const documentRef = doc(
+          db,
+          "modules",
+          arrayOfDocs[i].module,
+          arrayOfDocs[i].academicyear,
+          arrayOfDocs[i].term
+        );
+
+        const documentSnap = await getDoc(documentRef);
+
+        if (documentSnap.exists()) {
+          console.log(
+            documentSnap.data()[arrayOfDocs[i].uid] +
+            " is the fieldname in getModuleName"
+          );
+          modulename = documentSnap.data()[arrayOfDocs[i].uid];
+        }
+
+        const obj = {
+          modcode: arrayOfDocs[i].module,
+          createdby: nameHolder,
+          ay: arrayOfDocs[i].academicyear,
+          term: arrayOfDocs[i].term,
+          creatoruid: arrayOfDocs[i].uid,
+          modulename: modulename,
+        }
+
+        helper.push(obj);
+      }
+
+      setResArray(helper);
+      setStillSearching("hidden");
 
       if (!hasEntered) {
         throw Error("Sorry! No such module created yet!");
@@ -355,6 +343,8 @@ function Search() {
                 >
                   Enter
                 </Box>
+
+                <Spinner color="#F7B556" visibility={stillsearching} thickness="4px"/>
               </HStack>
             </FormControl>
           </VStack>
@@ -419,7 +409,7 @@ function Search() {
           padding="1.5%"
           opacity="0.9"
         >
-          <Flex marginBottom="1vw">
+          <Flex marginBottom="1vw" paddingRight="0.9rem">
             <Box width="12vw">
               <Text
                 fontSize="1.5vw"
@@ -505,6 +495,7 @@ function Search() {
             </Box>
           </Flex>
 
+          <Box overflowY="scroll" maxHeight="30vw">
           {resArray &&
             resArray.map((element, index) => (
               <div key={index}>
@@ -674,6 +665,7 @@ function Search() {
                 </Flex>
               </div>
             ))}
+            </Box>
         </GridItem>
       </Grid>
     </div>

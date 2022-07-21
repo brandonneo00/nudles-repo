@@ -22,11 +22,11 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
-  AlertTitle
+  AlertTitle,
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   collection,
@@ -47,7 +47,6 @@ function Leaderboard() {
   const [term, setTerm] = useState("");
   const [error, setError] = useState(null);
   const [resultArr, setResultArr] = useState("");
-
 
   function checkSearchInput(acadYear) {
     if (
@@ -112,7 +111,7 @@ function Leaderboard() {
               ay: docs.data().academicyear,
               term: docs.data().term,
               creatoruid: docs.data().uid,
-              modulename: modulename
+              modulename: modulename,
             });
 
             setResultArr(helperArr);
@@ -131,7 +130,8 @@ function Leaderboard() {
 
             if (documentSnap.exists()) {
               console.log(
-                documentSnap.data()[docs.data().uid] + " is the fieldname in getModuleName"
+                documentSnap.data()[docs.data().uid] +
+                  " is the fieldname in getModuleName"
               );
               return documentSnap.data()[docs.data().uid];
             } else {
@@ -199,7 +199,6 @@ function Leaderboard() {
                   <option>20-21</option>
                   <option>21-22</option>
                   <option>22-23</option>
-
                 </Select>
 
                 <Select
@@ -260,16 +259,21 @@ function Leaderboard() {
             margin="0% 2%"
             height="3vw"
           >
-            <AlertIcon boxSize="1vw"/>
+            <AlertIcon boxSize="1vw" />
             <AlertTitle>Error: </AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
+          </Alert>
         )}
       </Center>
 
-
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%" opacity="0.9">
+        <GridItem
+          bg="#E5E5E5"
+          borderRadius="15px"
+          margin="1% 2% 2%"
+          padding="1.5%"
+          opacity="0.9"
+        >
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text
@@ -367,11 +371,7 @@ function Leaderboard() {
 
                 <Spacer />
 
-                <Tooltip
-                  label={
-                    element.modulename
-                  }
-                >
+                <Tooltip label={element.modulename}>
                   <Container
                     height="4vw"
                     width="25vw"
@@ -452,10 +452,12 @@ function Leaderboard() {
                 </Tooltip>
 
                 <Spacer />
-                <Link to={{
-                  pathname: "/Ranking",
-                  state: { obj: element }
-                }}>
+                <Link
+                  to={{
+                    pathname: "/Ranking",
+                    state: { obj: element },
+                  }}
+                >
                   <Box width="12vw" textAlign="center" padding="0.9vw 0">
                     <Button
                       className="download-button"

@@ -1,9 +1,8 @@
 import TopBarV2 from "./components/TopBarV2";
 import logo from "./images/nudles-logo.PNG";
 import "./Welcome.css";
-import work from "./images/work-in-progress.png";
 import { useEffect, useState } from "react";
-import { Box, Image, Text, HStack, Center } from "@chakra-ui/react";
+import { Box, Text, HStack, Center } from "@chakra-ui/react";
 
 import { useCollection } from "./hooks/useCollection";
 
@@ -95,31 +94,6 @@ function Welcome() {
           ></Box>
         </Center>
         <ModulesDisplay />
-          
-
-        {/* <Box padding="5%">
-          <Text
-            fontSize="48px"
-            fontWeight="semibold"
-            color="#000000"
-            align="left"
-          >
-            Modules Added
-          </Text>
-          <Center bg="#FFFFFF00" height="40rem">
-            <Image boxSize="30rem" src={work} alt="Work-in-progress" />
-          </Center>
-          <Center bg="#FFFFFF00" color="black">
-            <Text
-              fontSize="60px"
-              fontWeight="bold"
-              color="#000000"
-              align="center"
-            >
-              (MODULES ADDED)
-            </Text>
-          </Center>
-        </Box> */}
       </Box>
     </>
   );

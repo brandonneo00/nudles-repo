@@ -41,9 +41,7 @@ function PopOver(props) {
         <PopoverHeader fontWeight="bold" textAlign="left">
           A Little Hint
         </PopoverHeader>
-        <PopoverBody textAlign="left">
-          {props.hint}
-        </PopoverBody>
+        <PopoverBody textAlign="left">{props.hint}</PopoverBody>
       </PopoverContent>
     </Popover>
   );

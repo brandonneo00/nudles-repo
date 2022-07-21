@@ -21,7 +21,6 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import React from "react";
-
 import "./LeftDrawer.css";
 
 function LeftDrawer() {

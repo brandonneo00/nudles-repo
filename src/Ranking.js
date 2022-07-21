@@ -1,29 +1,30 @@
 import {
-  HStack,
-  VStack,
   Text,
   Box,
   Center,
   Grid,
   GridItem,
   Flex,
-  Container,
   Spacer,
   Image,
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { db } from "./firebase/config";
-import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
-import { useState, useRef } from "react";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import { useState } from "react";
 import TopBarV2 from "./components/TopBarV2";
 import Correct from "./images/checked.png";
 import Wrong from "./images/cancel.png";
-// import Null from "./images/null.png";
-// import NotApplicable from "./images/not-applicable.png";
 import Dash from "./images/dash.png";
 import { useAuthContext } from "./hooks/useAuthContext";
 import _ from "lodash";
-
 
 function Ranking() {
   const location = useLocation();
@@ -63,24 +64,32 @@ function Ranking() {
     console.log(targetQID + " qid");
     console.log(helper + " array");
 
-    
-    const userRef = doc(db, "modules", obj.modcode, obj.ay, obj.term, obj.creatoruid, targetQID, "ranking", user.uid);
+    const userRef = doc(
+      db,
+      "modules",
+      obj.modcode,
+      obj.ay,
+      obj.term,
+      obj.creatoruid,
+      targetQID,
+      "ranking",
+      user.uid
+    );
     const userSnapshot = await getDoc(userRef);
-    
-    if (userSnapshot.exists()){
+
+    if (userSnapshot.exists()) {
       setUserData(userSnapshot.data());
-      console.log("this is indiv data " + userSnapshot.data())
+      console.log("this is indiv data " + userSnapshot.data());
     } else {
       const emptyUserData = {
         comparetime: "NIL",
         displaytime: "NIL",
         numtries: "NIL",
         tries: [null, null, null, null, null, null],
-        username: obj.createdby
+        username: obj.createdby,
       };
       setUserData(emptyUserData);
     }
-    
 
     return helper;
   };
@@ -131,11 +140,6 @@ function Ranking() {
   };
 
   const mergeSort = (array) => {
-    // array: [ [numtries1, time1, object1], [numtries2, time2, object2], ...]
-    // for (let i = 0; i < array.length; i++) {
-    //   const numOfTries = array[i][0];
-    // }
-
     const half = array.length / 2;
     if (array.length <= 1) {
       return array;
@@ -146,7 +150,6 @@ function Ranking() {
     return merge(mergeSort(left), mergeSort(right));
   };
 
-
   const handleClick = async () => {
     setButtonClick(!buttonclick);
 
@@ -155,22 +158,11 @@ function Ranking() {
     console.log(data + " unsorted Array");
     console.log(sortedData + " sorted Array");
     setSorted(sortedData);
-
-    // const docRef = doc(db, "modules", "SF");
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   console.log("Document data:", docSnap.data());
-    // } else {
-    //   // doc.data() will be undefined in this case
-    //   console.log("No such document!");
-    // }
-   
   };
 
   const findMyRank = (userdata) => {
     var object = [userdata.numtries, userdata.comparetime, userdata];
-    console.log( "this is my obj " + object)
+    console.log("this is my obj " + object);
     var ranking;
     var found = false;
     for (let i = 0; i < sorted.length; i++) {
@@ -186,7 +178,7 @@ function Ranking() {
     } else {
       return "NIL";
     }
-  }
+  };
   return (
     <div>
       <TopBarV2 />
@@ -281,7 +273,7 @@ function Ranking() {
 
             <Box overflowY="scroll" height="24vw" maxHeight="24vw">
               {sorted &&
-                  sorted.map((x, index) => (
+                sorted.map((x, index) => (
                   <Flex key={index} marginBottom="1vw">
                     <Box
                       height="4vw"
@@ -349,7 +341,12 @@ function Ranking() {
                       } else if (y === null) {
                         return (
                           <>
-                            <Box height="4vw" width="4vw" padding="0.5vw" key={index}>
+                            <Box
+                              height="4vw"
+                              width="4vw"
+                              padding="0.5vw"
+                              key={index}
+                            >
                               <Image
                                 width="3vw"
                                 height="3vw"
@@ -361,8 +358,7 @@ function Ranking() {
                         );
                       }
                     })}
-                    
-                    
+
                     <Box
                       height="4vw"
                       width="14vw"
@@ -380,105 +376,108 @@ function Ranking() {
                     </Box>
                   </Flex>
                 ))}
-
             </Box>
-          <Box
-            height="1vw"
-            border="2px"
-            borderColor="#E5E5E5"
-            borderBottomColor="#B5B5B5"
-            marginBottom="1rem"
-          /> 
+            <Box
+              height="1vw"
+              border="2px"
+              borderColor="#E5E5E5"
+              borderBottomColor="#B5B5B5"
+              marginBottom="1rem"
+            />
 
             {/* ---------------------------- Bottom User Ranking is here ---------------------------- */}
 
-          {userdata && (
-            <Flex marginTop="1rem" paddingRight="0.9rem">
-              <Box
-                height="4vw"
-                width="5vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0.9vw 0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw">
-                  {findMyRank(userdata)}
-                </Text>
-              </Box>
+            {userdata && (
+              <Flex marginTop="1rem" paddingRight="0.9rem">
+                <Box
+                  height="4vw"
+                  width="5vw"
+                  borderRadius="10px"
+                  bg="#EDF6F9"
+                  padding="0.9vw 0"
+                >
+                  <Text
+                    fontWeight="semibold"
+                    textAlign="center"
+                    fontSize="1.5vw"
+                  >
+                    {findMyRank(userdata)}
+                  </Text>
+                </Box>
 
-              <Spacer />
+                <Spacer />
 
-              <Box
-                height="4vw"
-                width="30vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0.9vw 0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw">
-                  {userdata.username}
-                </Text>
-              </Box>
+                <Box
+                  height="4vw"
+                  width="30vw"
+                  borderRadius="10px"
+                  bg="#EDF6F9"
+                  padding="0.9vw 0"
+                >
+                  <Text
+                    fontWeight="semibold"
+                    textAlign="center"
+                    fontSize="1.5vw"
+                  >
+                    {userdata.username}
+                  </Text>
+                </Box>
 
-              <Spacer />
+                <Spacer />
 
-              {userdata.tries.map((y, index) => {
-                      if (y === true) {
-                        return (
-                          <>
-                            <Box height="4vw" width="4vw" key={index}>
-                              <Image
-                                width="4vw"
-                                height="4vw" //??????
-                                src={Correct}
-                              ></Image>
-                            </Box>
-                            <Spacer />
-                        </>
-                        );
-                      } else if (y === false) {
-                        return (
-                          <>
-                            <Box height="4vw" width="4vw" key={index}>
-                              <Image
-                                width="4vw"
-                                height="4vw"
-                                src={Wrong}
-                              ></Image>
-                            </Box>
-                            <Spacer />
-                            </>
-                        );
-                      } else if (y === null) {
-                        return (
-                          <>
-                            <Box height="4vw" width="4vw" padding="0.5vw" key={index}>
-                              <Image
-                                width="3vw"
-                                height="3vw"
-                                src={Dash}
-                              ></Image>
-                            </Box>
-                            <Spacer />
-                          </>
-                        );
-                      }
-                    })}
+                {userdata.tries.map((y, index) => {
+                  if (y === true) {
+                    return (
+                      <>
+                        <Box height="4vw" width="4vw" key={index}>
+                          <Image width="4vw" height="4vw" src={Correct}></Image>
+                        </Box>
+                        <Spacer />
+                      </>
+                    );
+                  } else if (y === false) {
+                    return (
+                      <>
+                        <Box height="4vw" width="4vw" key={index}>
+                          <Image width="4vw" height="4vw" src={Wrong}></Image>
+                        </Box>
+                        <Spacer />
+                      </>
+                    );
+                  } else if (y === null) {
+                    return (
+                      <>
+                        <Box
+                          height="4vw"
+                          width="4vw"
+                          padding="0.5vw"
+                          key={index}
+                        >
+                          <Image width="3vw" height="3vw" src={Dash}></Image>
+                        </Box>
+                        <Spacer />
+                      </>
+                    );
+                  }
+                })}
 
-              <Box
-                height="4vw"
-                width="14vw"
-                borderRadius="10px"
-                bg="#EDF6F9"
-                padding="0.9vw 0"
-              >
-                <Text fontWeight="semibold" textAlign="center" fontSize="1.5vw">
-                  {userdata.displaytime}
-                </Text>
-              </Box>
-            </Flex>
-          )}
-            
+                <Box
+                  height="4vw"
+                  width="14vw"
+                  borderRadius="10px"
+                  bg="#EDF6F9"
+                  padding="0.9vw 0"
+                >
+                  <Text
+                    fontWeight="semibold"
+                    textAlign="center"
+                    fontSize="1.5vw"
+                  >
+                    {userdata.displaytime}
+                  </Text>
+                </Box>
+              </Flex>
+            )}
           </GridItem>
         </Grid>
       ) : (

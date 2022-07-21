@@ -10,16 +10,16 @@ import ForgetPassword from "./ForgetPassword";
 import Search from "./Search";
 import Play from "./Play";
 import ResourceLibrary from "./ResourceLibrary";
-import InputQuestion from "./InputQuestion";
+// import InputQuestion from "./InputQuestion";
 import Leaderboard from "./Leaderboard";
 import AdminLogin from "./AdminLogin";
 import ChangePassword from "./ChangePassword";
 import UpdateProfile from "./UpdateProfile";
 import ModuleSelection from "./ModuleSelection";
-import CompiledQuestions from "./CompiledQuestions";
+// import CompiledQuestions from "./CompiledQuestions";
 import Ranking from "./Ranking";
 import UpdateInputQuestion from "./UpdateInputQuestion";
-import Profile from "./Profile";
+// import Profile from "./Profile";
 import CompiledQuestionsV2 from "./CompiledQuestionsV2";
 
 function App() {
@@ -56,10 +56,6 @@ function App() {
               {user && <ResourceLibrary />}
               {!user && <Redirect to="/" />}
             </Route>
-            {/* <Route exact path="/InputQuestion">
-              {user && <InputQuestion />}
-              {!user && <Redirect to="/" />}
-            </Route> */}
             <Route exact path="/Leaderboard">
               {user && <Leaderboard />}
               {!user && <Redirect to="/" />}
@@ -79,10 +75,6 @@ function App() {
               {user && <ModuleSelection />}
               {!user && <Redirect to="/" />}
             </Route>
-            {/* <Route exact path="/CompiledQuestions">
-              {user && <CompiledQuestions />}
-              {!user && <Redirect to="/" />}
-            </Route> */}
             <Route exact path="/Ranking">
               {user && <Ranking />}
               {!user && <Redirect to="/" />}
@@ -91,11 +83,6 @@ function App() {
               {user && <UpdateInputQuestion />}
               {!user && <Redirect to="/" />}
             </Route>
-            {/* <Route exact path="/Profile">
-              {user && <Profile />}
-              {!user && <Redirect to="/" />}
-            </Route> */}
-
             <Route exact path="/CompiledQuestions">
               {user && <CompiledQuestionsV2 />}
               {!user && <Redirect to="/" />}

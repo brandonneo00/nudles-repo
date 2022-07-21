@@ -27,7 +27,7 @@ import {
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   doc,
   collection,
@@ -51,7 +51,6 @@ function Search() {
   const [error, setError] = useState(null);
   const [resArray, setResArray] = useState("");
   const [added, setAdded] = useState(false);
-  const [success, setSuccess] = useState(false);
   const { user } = useAuthContext();
   const [deleted, setDeleted] = useState(false);
   const [tempSet, setTempSet] = useState("");
@@ -86,7 +85,7 @@ function Search() {
       term: term,
       creatorusername: creatorUsername,
       creatoruid: creatorUID,
-      modulename: modulename
+      modulename: modulename,
     };
 
     const docRef = doc(db, "likedmodules", user.uid);
@@ -122,7 +121,7 @@ function Search() {
       term: term,
       creatorusername: creatorUsername,
       creatoruid: creatorUID,
-      modulename: modulename
+      modulename: modulename,
     };
 
     //Get modArray data from the likedmodules collection
@@ -155,8 +154,6 @@ function Search() {
     //If empty/not inside then we add
     setAdded(true);
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -192,7 +189,6 @@ function Search() {
           uniqueSet.add(docs.data().uid);
           console.log(uniqueSet.size + " unique set length");
           setTempSet(uniqueSet);
-        
 
           const userRef = collection(db, "userprofiles");
 
@@ -204,7 +200,7 @@ function Search() {
           let nameHolder;
 
           const snapShot1 = async () => {
-            console.log("into snapShot1")
+            console.log("into snapShot1");
             const qUserRef = await getDocs(queryUserRef);
             qUserRef.forEach((file) => (nameHolder = file.data().username));
             const modulename = await getModuleName();
@@ -218,10 +214,13 @@ function Search() {
               creatoruid: docs.data().uid,
               modulename: modulename,
             });
-            console.log("helper[] length: " + helper.length + " helper[]: " + helper);
-            console.log("setting resarray")
+            console.log(
+              "helper[] length: " + helper.length + " helper[]: " + helper
+            );
+            // console.log("setting resarray");
             setResArray(helper);
-            console.log(resArray + " is resarray usestate")
+            // console.log(resArray + " is resarray usestate");
+            console.log("snapshot finished")
           };
 
           const getModuleName = async () => {
@@ -237,7 +236,8 @@ function Search() {
 
             if (documentSnap.exists()) {
               console.log(
-                documentSnap.data()[docs.data().uid] + " is the fieldname in getModuleName"
+                documentSnap.data()[docs.data().uid] +
+                  " is the fieldname in getModuleName"
               );
               return documentSnap.data()[docs.data().uid];
             } else {
@@ -264,8 +264,6 @@ function Search() {
       console.error(e);
     }
   };
-
-
 
   return (
     <div className="searchdiv">
@@ -298,30 +296,6 @@ function Search() {
                   value={modulecode.toUpperCase()}
                   fontSize="1.2vw"
                 />
-
-                {/* <Box>
-                  <Text
-                    fontSize="1.5vw"
-                    fontWeight="semibold"
-                    color="#000000"
-                    lineHeight="1.3"
-                    align="left"
-                  >
-                    ACADEMIC YEAR
-                  </Text>
-                </Box> */}
-
-                {/* <Field
-                  as={Input}
-                  id="modulecode"
-                  name="academic year"
-                  variant="filled"
-                  width="9vw"
-                  height="1.875vw"
-                  placeholder="E.g. 21-22"
-                  onChange={(e) => setAcademicYear(e.target.value)}
-                  value={academicyear}
-                /> */}
 
                 {/* new dropdown for the searches */}
                 <Select
@@ -558,14 +532,7 @@ function Search() {
 
                   <Spacer />
 
-                  <Tooltip
-                    label={
-                      // <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                      //   {" "}
-                      // </ModuleNameAPI>
-                      element.modulename
-                    }
-                  >
+                  <Tooltip label={element.modulename}>
                     <Container
                       height="4vw"
                       width="25vw"
@@ -579,9 +546,6 @@ function Search() {
                         fontSize="1.5vw"
                         noOfLines={1}
                       >
-                        {/* <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                          {" "}
-                        </ModuleNameAPI> */}
                         {element.modulename}
                       </Text>
                     </Container>

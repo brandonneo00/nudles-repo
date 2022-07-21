@@ -1,7 +1,5 @@
 import { Center, Grid, GridItem, Input, HStack } from "@chakra-ui/react";
-import {
-  FormControl,
-} from "@chakra-ui/react";
+import { FormControl } from "@chakra-ui/react";
 
 import { Field, Formik } from "formik";
 function GuessBox(props) {
@@ -22,18 +20,18 @@ function GuessBox(props) {
             <form onSubmit={props.enter}>
               <FormControl color="black">
                 <HStack>
-                <Field
-                  as={Input}
-                  id="guess"
-                  name="guess"
-                  variant="unstyled"
-                  onChange={props.onChange1}
-                  value={props.value1}
-                  textAlign="center"
-                  fontWeight="bold"
-                  fontSize="2.083vw"
-                  isDisabled={props.permission}
-                />
+                  <Field
+                    as={Input}
+                    id="guess"
+                    name="guess"
+                    variant="unstyled"
+                    onChange={props.onChange1}
+                    value={props.value1}
+                    textAlign="center"
+                    fontWeight="bold"
+                    fontSize="2.083vw"
+                    isDisabled={props.permission}
+                  />
                 </HStack>
               </FormControl>
             </form>

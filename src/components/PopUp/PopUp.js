@@ -64,7 +64,6 @@ function PopUp(props) {
               fontSize="1vw"
               width="8vw"
               height="2vw"
-              
             >
               Slurping Out
             </Button>

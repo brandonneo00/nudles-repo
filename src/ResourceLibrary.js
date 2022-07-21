@@ -22,12 +22,11 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
-  AlertTitle
+  AlertTitle,
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-
+import { useState } from "react";
 import {
   collection,
   query,
@@ -47,30 +46,6 @@ function ResourceLibrary() {
   const [term, setTerm] = useState("");
   const [error, setError] = useState(null);
   const [resultArr, setResultArr] = useState("");
-
-  // function ModuleNameAPI(props) {
-  //   const nusmodsAPI =
-  //     "https://api.nusmods.com/v2/" +
-  //     formatYear(props.ay) +
-  //     "/modules/" +
-  //     props.mc +
-  //     ".json";
-  //   const [moduleName, setModuleName] = useState("Loading.....");
-  //   useEffect(() => {
-  //     fetch(nusmodsAPI)
-  //       .then((response) => response.json())
-  //       .then((data) => setModuleName(data.title))
-  //       .catch((error) =>
-  //         setModuleName(`Unable to retrieve Module Name: ${error}`)
-  //       );
-  //   }, []);
-
-  //   return moduleName;
-  // }
-
-  // function formatYear(acadyear) {
-  //   return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
-  // }
 
   function checkSearchInput(acadYear) {
     if (
@@ -129,14 +104,13 @@ function ResourceLibrary() {
             ref.forEach((file) => (usernamePlaceholder = file.data().username));
             const modulename = await getModuleName();
 
-
             helperArr.push({
               modcode: docs.data().module,
               createdby: usernamePlaceholder,
               ay: docs.data().academicyear,
               term: docs.data().term,
               creatoruid: docs.data().uid,
-              modulename: modulename
+              modulename: modulename,
             });
 
             setResultArr(helperArr);
@@ -155,14 +129,15 @@ function ResourceLibrary() {
 
             if (documentSnap.exists()) {
               console.log(
-                documentSnap.data()[docs.data().uid] + " is the fieldname in getModuleName"
+                documentSnap.data()[docs.data().uid] +
+                  " is the fieldname in getModuleName"
               );
               return documentSnap.data()[docs.data().uid];
             } else {
               console.log("No such document!");
             }
           };
-          
+
           hello();
         }
       });
@@ -210,29 +185,6 @@ function ResourceLibrary() {
                   fontSize="1.2vw"
                 />
 
-                {/* <Box>
-                  <Text
-                    fontSize="1.5vw"
-                    fontWeight="semibold"
-                    color="#000000"
-                    lineHeight="1.3"
-                    align="left"
-                  >
-                    ACADEMIC YEAR
-                  </Text>
-                </Box> */}
-                {/* <Field
-                  as={Input}
-                  id="modulecode"
-                  name="academic year"
-                  variant="filled"
-                  width="9vw"
-                  height="1.875vw"
-                  placeholder="E.g. 21-22"
-                  onChange={(e) => setAcademicYear(e.target.value)}
-                  value={academicyear}
-                /> */}
-
                 {/* new dropdown for the searches */}
                 <Select
                   variant="filled"
@@ -248,7 +200,6 @@ function ResourceLibrary() {
                   <option>20-21</option>
                   <option>21-22</option>
                   <option>22-23</option>
-                  
                 </Select>
 
                 <Select
@@ -308,18 +259,22 @@ function ResourceLibrary() {
             fontSize="1vw"
             margin="0% 2%"
             height="3vw"
-
           >
-            <AlertIcon boxSize="1vw"/>
+            <AlertIcon boxSize="1vw" />
             <AlertTitle>Error: </AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
-        </Alert>
+          </Alert>
         )}
       </Center>
 
-
       <Grid minHeight="40vw">
-        <GridItem bg="#E5E5E5" borderRadius="15px" margin="1% 2% 2%" padding="1.5%" opacity="0.9">
+        <GridItem
+          bg="#E5E5E5"
+          borderRadius="15px"
+          margin="1% 2% 2%"
+          padding="1.5%"
+          opacity="0.9"
+        >
           <Flex marginBottom="1vw">
             <Box width="12vw">
               <Text
@@ -417,14 +372,7 @@ function ResourceLibrary() {
 
                 <Spacer />
 
-                <Tooltip
-                  label={
-                    // <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                    //   {" "}
-                    // </ModuleNameAPI>
-                    element.modulename
-                  }
-                >
+                <Tooltip label={element.modulename}>
                   <Container
                     height="4vw"
                     width="25vw"
@@ -438,9 +386,6 @@ function ResourceLibrary() {
                       fontSize="1.5vw"
                       noOfLines={1}
                     >
-                      {/* <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                        {" "}
-                      </ModuleNameAPI> */}
                       {element.modulename}
                     </Text>
                   </Container>
@@ -508,10 +453,12 @@ function ResourceLibrary() {
                 </Tooltip>
 
                 <Spacer />
-                <Link to={{
-                  pathname: "/CompiledQuestionsV2",
-                  state: { obj: element }
-                }}>
+                <Link
+                  to={{
+                    pathname: "/CompiledQuestionsV2",
+                    state: { obj: element },
+                  }}
+                >
                   <Box width="10vw" textAlign="center" padding="0.9vw 0">
                     <Button
                       className="download-button"

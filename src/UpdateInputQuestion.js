@@ -17,27 +17,18 @@ import {
   AlertDescription,
   AlertTitle,
   Checkbox,
-  CheckboxGroup,
   Flex,
   Spacer,
 } from "@chakra-ui/react";
 import "./InputQuestion.css";
 import { Formik, Field } from "formik";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useCollection } from "./hooks/useCollection";
 
 import { db } from "./firebase/config";
 import { doc } from "firebase/firestore"; // for deleting or updating documemts
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-  setDoc,
-} from "firebase/firestore";
+import { collection, addDoc, setDoc } from "firebase/firestore";
 
 import QuestionList from "./QuestionList";
 import { useAuthContext } from "./hooks/useAuthContext";
@@ -474,11 +465,13 @@ function UpdateInputQuestion() {
                         fontWeight="regular"
                         align="left"
                       >
-                        Note: Naming of Modules will be based on the following priority:
+                        Note: Naming of Modules will be based on the following
+                        priority:
                         <br></br>
                         1. Can be fetched from NUSMODs based on AY & Module Code
                         <br></br>
-                        2. Most Recent input for Module Name field (If cannot be fetched from NUSMODs)
+                        2. Most Recent input for Module Name field (If cannot be
+                        fetched from NUSMODs)
                       </Text>
                     </HStack>
                   </>

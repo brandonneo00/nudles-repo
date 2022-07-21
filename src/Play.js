@@ -34,18 +34,14 @@ import { useAuthContext } from "./hooks/useAuthContext";
 import { useCollection } from "./hooks/useCollection";
 import schedule from "node-schedule";
 import InputChecker from "./components/InputChecker";
-//import {setTimeout} from "timers/promises";
 
 function Play(props) {
-  // var timeNow = new Date();
-  // console.log(timeNow);
-
-  schedule.scheduleJob("00 21 22 * * *", () => {
+  schedule.scheduleJob("00 00 00 * * *", () => {
     console.log("Scheduled Reset Occurs");
     doDuringMidnight();
   });
 
-  schedule.scheduleJob("02 21 22 * * *", () => {
+  schedule.scheduleJob("02 00 00 * * *", () => {
     console.log("Reloading Page");
     window.location.reload();
   });
@@ -110,8 +106,6 @@ function Play(props) {
   const [chosenQn, setChosenQn] = useState("");
   const [playBefore, setPlayBefore] = useState(false);
   const [clickBefore, setClickBefore] = useState(false);
-  // const [compareTime, setCompareTime] = useState("");
-  // const [displayTime, setDisplayTime] = useState("");
 
   const location = useLocation();
   const { obj } = location.state;
@@ -395,8 +389,6 @@ function Play(props) {
       displaytiming = displaytiming + ":" + milliseconds;
       console.log("The display timing is " + displaytiming);
       var comparetiming = today.getTime();
-      // setCompareTime(comparetiming);
-      // setDisplayTime(displaytiming);
       setSolved(true);
       setRankingCollection(num, answerKey, displaytiming, comparetiming);
     }
@@ -475,7 +467,12 @@ function Play(props) {
     user.uid,
   ]);
 
-  const setRankingCollection = async (num, answerkey, displaytime, comparetime) => {
+  const setRankingCollection = async (
+    num,
+    answerkey,
+    displaytime,
+    comparetime
+  ) => {
     console.log("entered ranking collection");
     //creating reference to the fortheday collection
     const forthedayRef = collection(db, "fortheday");
@@ -495,11 +492,6 @@ function Play(props) {
       todayObj = file.data();
     });
 
-    // console.log(todayObj.questionid + " this is questionid");
-    // console.log(obj.modulecode + " this is modcode");
-    // console.log(obj.academicyear + " this is ay");
-    // console.log(obj.term + " this is temr");
-    // console.log(obj.creatoruid + " creatoruid");
     const rankingRef = doc(
       db,
       "modules",
@@ -755,7 +747,7 @@ function Play(props) {
 
   function textCreator(userInput, answerKey) {
     const colorArray = InputChecker(userInput, answerKey);
-    
+
     //output of answerchecker is [["colortoPaint", "inputLetter_one"], ["colortoPaint", "inputLetter_two"], ...]
     var keyID = 0;
     return colorArray.map((x) => {
@@ -768,14 +760,6 @@ function Play(props) {
     });
   }
 
-  // put in temporary array
-  // run a for loop through the array
-  // in the for loop check if each qn setBefore field is false
-  // if false: choose this question by setting temp variable and set setBefore as true --> break out of for loop
-  // using the temp variable, set the qn, hint, answer, no. of letters [json object already]
-
-  // var tempArr1 = [];
-  // var newArr1 = [];
   const doDuringMidnight = async () => {
     const forthedayRef = await getDocs(collection(db, "fortheday"));
     forthedayRef.forEach((docs) => {
@@ -816,36 +800,6 @@ function Play(props) {
         { merge: true }
       );
     });
-
-    // const guessesSnap = await getDoc(guessesDocRef);
-    // if (guessesSnap.exists()) {
-    //   console.log("resetting all the guesses at midnight")
-    //   tempArr1 = guessesSnap.data().guessArray;
-    //   for (let i = 0; i < tempArr1.length; i++) {
-    //     newArr1.push({
-    //       modulecode: tempArr1[i].modulecode,
-    //       academicyear: tempArr1[i].academicyear,
-    //       term: tempArr1[i].term,
-    //       creatoruid: tempArr1[i].creatoruid,
-    //       guessBefore: false,
-    //       guess1: "",
-    //       guess2: "",
-    //       guess3: "",
-    //       guess4: "",
-    //       guess5: "",
-    //       guess6: "",
-    //       boxstate1: false,
-    //       boxstate2: true,
-    //       boxstate3: true,
-    //       boxstate4: true,
-    //       boxstate5: true,
-    //       boxstate6: true,
-    //       solvedstate: false,
-    //     })
-    //   }
-    //   setDoc(guessesDocRef, { guessArray: newArr1 }, { merge: true });
-    // }
-    // window.location.reload(true);
   };
 
   var placeholderArr = [];
@@ -1035,71 +989,6 @@ function Play(props) {
       );
     }
 
-    // const getQuestion = async () => {
-    //   const querySnapshot = await getDocs(
-    //     collection(
-    //       db,
-    //       "modules",
-    //       obj.modulecode,
-    //       obj.academicyear,
-    //       obj.term,
-    //       obj.creatoruid
-    //     )
-    //   );
-    //   querySnapshot.forEach((doc) => {
-    //     helperArr.push(doc);
-    //   });
-
-    //   for (let i = 0; i < helperArr.length; i++) {
-    //     const chosenBefore = helperArr[i].data().setBefore;
-    //     if (!chosenBefore) {
-    //       //using docID
-    //       const Ref = doc(
-    //         db,
-    //         "modules",
-    //         obj.modulecode,
-    //         obj.academicyear,
-    //         obj.term,
-    //         obj.creatoruid,
-    //         helperArr[i].id
-    //       );
-    //       //Set the module collection setBefore field as true
-    //       setDoc(Ref, { setBefore: true }, { merge: true });
-
-    //       //Set the fortheday collection resetBefore field as true and change the
-    //       //question, hint, answer and explanation as the chosen new fields
-    //       if (todayObj === undefined) {
-    //         await addDoc(collection(db, "fortheday"), {
-    //           modulecode: obj.modulecode,
-    //           ay: obj.academicyear,
-    //           term: obj.term,
-    //           creatoruid: obj.creatoruid,
-    //           question: helperArr[i].data().question,
-    //           answer: helperArr[i].data().answer,
-    //           hint: helperArr[i].data().hint,
-    //           explanation: helperArr[i].data().explanation,
-    //           resetBefore: true
-    //         })
-    //       } else {
-    //         const forTheDayObj = doc(db, "fortheday", todayObj.id)
-    //         setDoc(forTheDayObj, {
-    //           question: helperArr[i].data().question,
-    //           answer: helperArr[i].data().answer,
-    //           hint: helperArr[i].data().hint,
-    //           explanation: helperArr[i].data().explanation,
-    //           resetBefore: true
-    //         }, { merge: true })
-    //       }
-
-    //       break;
-    //     }
-    //   }
-    // }
-    // if is a totally new entry/selection OR havent reset question cuz before midnight then do this
-    // if (todayObj === undefined || !todayObj.data().resetBefore) {
-    //   getQuestion();
-    // }
-
     //executing the fortheday query
     const forthedaySnapshot2 = await getDocs(forthedayQuery);
     //storing it in a variable
@@ -1115,7 +1004,6 @@ function Play(props) {
       explanation: todayObj2.data().explanation,
     });
     setClickBefore(true);
-    //window.location.reload();
   };
 
   return (

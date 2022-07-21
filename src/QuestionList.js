@@ -1,9 +1,6 @@
 //firebase imports
 import { db } from "./firebase/config";
-import {
-  doc,
-  deleteDoc,
-} from "firebase/firestore"; // for deleting or updating documemts
+import { doc, deleteDoc } from "firebase/firestore"; // for deleting or updating documemts
 import {
   Box,
   HStack,
@@ -29,7 +26,6 @@ export default function QuestionList(props) {
     const secondDocRef = doc(db, props.path, id);
     await deleteDoc(secondDocRef);
   };
-
 
   return (
     <Box overflowY="scroll" maxHeight="40vw">

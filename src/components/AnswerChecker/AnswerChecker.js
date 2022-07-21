@@ -3,7 +3,7 @@ function AnswerChecker(userInput, correctAns) {
   const greenColor = "#6AAA64";
   const orangeColor = "#F7B556";
   const greyColor = "#787E7E";
-  
+
   var colorArray = [];
 
   for (let i = 0; i < inputLength; i++) {

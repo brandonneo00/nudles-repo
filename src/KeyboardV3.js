@@ -1,12 +1,6 @@
-import {
-  Box,
-  HStack,
-  VStack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, HStack, VStack, Text } from "@chakra-ui/react";
 
 function KeyboardV3(props) {
-
   function KeyboardButton(args) {
     return (
       <Box
@@ -121,7 +115,6 @@ function KeyboardV3(props) {
           fontSizing="0.833vw"
           tone={props.colorZero}
         />
-
       </HStack>
       <HStack spacing="0.4vw">
         <KeyboardButton

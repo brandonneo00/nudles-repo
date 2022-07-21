@@ -23,6 +23,7 @@ import {
   AlertIcon,
   AlertDescription,
   AlertTitle,
+  Spinner
 } from "@chakra-ui/react";
 import { Formik, Field } from "formik";
 import { Link } from "react-router-dom";
@@ -47,6 +48,7 @@ function Leaderboard() {
   const [term, setTerm] = useState("");
   const [error, setError] = useState(null);
   const [resultArr, setResultArr] = useState("");
+  const [stillsearching, setStillSearching] = useState("hidden");
 
   function checkSearchInput(acadYear) {
     if (
@@ -61,86 +63,84 @@ function Leaderboard() {
     }
   }
 
-  var helperArr = [];
+  var helper = [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setResultArr("");
     setError("");
+    setStillSearching("visible");
 
     try {
       checkSearchInput(academicyear);
       //creating reference to the questions collection in our firestore database
       const questionsRef = collection(db, "questions");
       //creating query against the questions collection
-      const qnCollectionQuery = query(
+      const _q = query(
         questionsRef,
         where("academicyear", "==", academicyear),
         where("module", "==", modulecode.toUpperCase()),
         where("term", "==", term)
       );
-      // creating a Js Set to store unique unique academicyear, modulecode, term
-      var setUnique = new Set();
+      // executing the query
+      const qn_querySnapshot = await getDocs(_q);
+
+      var uniqueSet = new Set();
       var hasEntered = false;
+      var arrayOfDocs = [];
 
-      //executing the query
-      const qnCollectionQuerySnapshot = await getDocs(qnCollectionQuery);
-      qnCollectionQuerySnapshot.forEach((docs) => {
+      qn_querySnapshot.forEach((docs) => {
         hasEntered = true;
-        if (!setUnique.has(docs.data().uid)) {
-          setUnique.add(docs.data().uid);
-
-          //creating secondary reference to another collection in firestore --> userprofiles
-          const userprofilesRef = collection(db, "userprofiles");
-          //creating secondary Query to userprofiles collection
-          const userprofilesQuery = query(
-            userprofilesRef,
-            where("uid", "==", docs.data().uid)
-          );
-
-          let usernamePlaceholder;
-          const hello = async () => {
-            //executing the secondary query
-            const ref = await getDocs(userprofilesQuery);
-            ref.forEach((file) => (usernamePlaceholder = file.data().username));
-            const modulename = await getModuleName();
-
-            helperArr.push({
-              modcode: docs.data().module,
-              createdby: usernamePlaceholder,
-              ay: docs.data().academicyear,
-              term: docs.data().term,
-              creatoruid: docs.data().uid,
-              modulename: modulename,
-            });
-
-            setResultArr(helperArr);
-          };
-
-          const getModuleName = async () => {
-            const documentRef = doc(
-              db,
-              "modules",
-              docs.data().module,
-              docs.data().academicyear,
-              docs.data().term
-            );
-
-            const documentSnap = await getDoc(documentRef);
-
-            if (documentSnap.exists()) {
-              console.log(
-                documentSnap.data()[docs.data().uid] +
-                  " is the fieldname in getModuleName"
-              );
-              return documentSnap.data()[docs.data().uid];
-            } else {
-              console.log("No such document!");
-            }
-          };
-          hello();
+        if (!uniqueSet.has(docs.data().uid)) {
+          uniqueSet.add(docs.data().uid);
+          arrayOfDocs.push(docs.data());
         }
       });
+
+      const userRef = collection(db, "userprofiles");
+
+      for (let i = 0; i < arrayOfDocs.length; i++) {
+        let nameHolder;
+        let modulename;
+        const queryUserRef = query(
+          userRef,
+          where("uid", "==", arrayOfDocs[i].uid)
+        );
+        const qUserRef = await getDocs(queryUserRef);
+        qUserRef.forEach((file) => (nameHolder = file.data().username));
+
+        const documentRef = doc(
+          db,
+          "modules",
+          arrayOfDocs[i].module,
+          arrayOfDocs[i].academicyear,
+          arrayOfDocs[i].term
+        );
+
+        const documentSnap = await getDoc(documentRef);
+
+        if (documentSnap.exists()) {
+          console.log(
+            documentSnap.data()[arrayOfDocs[i].uid] +
+            " is the fieldname in getModuleName"
+          );
+          modulename = documentSnap.data()[arrayOfDocs[i].uid];
+        }
+
+        const obj = {
+          modcode: arrayOfDocs[i].module,
+          createdby: nameHolder,
+          ay: arrayOfDocs[i].academicyear,
+          term: arrayOfDocs[i].term,
+          creatoruid: arrayOfDocs[i].uid,
+          modulename: modulename,
+        }
+
+        helper.push(obj);
+      }
+
+      setResultArr(helper);
+      setStillSearching("hidden");
       if (!hasEntered) {
         throw Error("Sorry! No such module created yet");
       }
@@ -242,6 +242,7 @@ function Leaderboard() {
                 >
                   Enter
                 </Box>
+                <Spinner color="#F7B556" visibility={stillsearching} thickness="4px"/>
               </HStack>
             </FormControl>
           </VStack>
@@ -274,7 +275,7 @@ function Leaderboard() {
           padding="1.5%"
           opacity="0.9"
         >
-          <Flex marginBottom="1vw">
+          <Flex marginBottom="1vw" paddingRight="0.9rem">
             <Box width="12vw">
               <Text
                 fontSize="1.5vw"
@@ -347,7 +348,8 @@ function Leaderboard() {
               </Text>
             </Box>
           </Flex>
-
+          
+          <Box overflowY="scroll" maxHeight="30vw">
           {resultArr &&
             resultArr.map((element, index) => (
               <Flex key={index} marginBottom="1vw">
@@ -484,6 +486,7 @@ function Leaderboard() {
                 </Link>
               </Flex>
             ))}
+            </Box>
         </GridItem>
       </Grid>
     </div>

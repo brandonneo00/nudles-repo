@@ -27,27 +27,28 @@ import {
   where,
   getDocs,
   setDoc,
-  addDoc
+  addDoc,
 } from "firebase/firestore";
 import { db } from "./firebase/config";
 import { useAuthContext } from "./hooks/useAuthContext";
-import schedule from 'node-schedule';
+import { useCollection } from "./hooks/useCollection";
+import schedule from "node-schedule";
+import InputChecker from "./components/InputChecker";
 //import {setTimeout} from "timers/promises";
 
 function Play(props) {
+  // var timeNow = new Date();
+  // console.log(timeNow);
 
-  var timeNow = new Date();
-  console.log(timeNow);
-
-  schedule.scheduleJob('00 21 22 * * *', () => {
+  schedule.scheduleJob("00 21 22 * * *", () => {
     console.log("Scheduled Reset Occurs");
-    doDuringMidnight();   
-  })
+    doDuringMidnight();
+  });
 
-  schedule.scheduleJob('02 21 22 * * *', () => {
+  schedule.scheduleJob("02 21 22 * * *", () => {
     console.log("Reloading Page");
-    window.location.reload();   
-  })
+    window.location.reload();
+  });
 
   const { user } = useAuthContext();
   const [disableBox1, setBox1] = useState(false);
@@ -109,6 +110,8 @@ function Play(props) {
   const [chosenQn, setChosenQn] = useState("");
   const [playBefore, setPlayBefore] = useState(false);
   const [clickBefore, setClickBefore] = useState(false);
+  // const [compareTime, setCompareTime] = useState("");
+  // const [displayTime, setDisplayTime] = useState("");
 
   const location = useLocation();
   const { obj } = location.state;
@@ -186,10 +189,11 @@ function Play(props) {
       setColorY(greenColor);
     } else if (alphabet === "Z") {
       setColorZ(greenColor);
-    } else if (alphabet === "1") { //start of color coding for the numbers on the keyboard
+    } else if (alphabet === "1") {
+      //start of color coding for the numbers on the keyboard
       setColorOne(greenColor);
     } else if (alphabet === "2") {
-      setColorTwo(greenColor); 
+      setColorTwo(greenColor);
     } else if (alphabet === "3") {
       setColorThree(greenColor);
     } else if (alphabet === "4") {
@@ -263,10 +267,11 @@ function Play(props) {
       setColorY(orangeColor);
     } else if (alphabet === "Z" && colorZ !== greenColor) {
       setColorZ(orangeColor);
-    } else if (alphabet === "1" && colorOne !== greenColor) { //start of color coding for the numbers on the keyboard
+    } else if (alphabet === "1" && colorOne !== greenColor) {
+      //start of color coding for the numbers on the keyboard
       setColorOne(orangeColor);
     } else if (alphabet === "2" && colorTwo !== greenColor) {
-      setColorTwo(orangeColor); 
+      setColorTwo(orangeColor);
     } else if (alphabet === "3" && colorThree !== greenColor) {
       setColorThree(orangeColor);
     } else if (alphabet === "4" && colorFour !== greenColor) {
@@ -340,10 +345,11 @@ function Play(props) {
       setColorY(greyColor);
     } else if (alphabet === "Z") {
       setColorZ(greyColor);
-    } else if (alphabet === "1") { //start of color coding for the numbers on the keyboard
+    } else if (alphabet === "1") {
+      //start of color coding for the numbers on the keyboard
       setColorOne(greyColor);
     } else if (alphabet === "2") {
-      setColorTwo(greyColor); 
+      setColorTwo(greyColor);
     } else if (alphabet === "3") {
       setColorThree(greyColor);
     } else if (alphabet === "4") {
@@ -379,14 +385,23 @@ function Play(props) {
     }
   }
 
-  function stopAfterCorrect(userInput, answerKey, setBox) {
+  function stopAfterCorrect(userInput, answerKey, setBox, num) {
     if (userInput !== answerKey && setBox !== null) {
       setBox(false);
     } else {
+      var today = new Date();
+      var displaytiming = today.toLocaleTimeString();
+      var milliseconds = today.getMilliseconds();
+      displaytiming = displaytiming + ":" + milliseconds;
+      console.log("The display timing is " + displaytiming);
+      var comparetiming = today.getTime();
+      // setCompareTime(comparetiming);
+      // setDisplayTime(displaytiming);
       setSolved(true);
+      setRankingCollection(num, answerKey, displaytiming, comparetiming);
     }
   }
-  
+
   function handleChangeInput(event) {
     event.preventDefault();
 
@@ -420,10 +435,12 @@ function Play(props) {
     const guessesSnap = await getDoc(guessesDocRef);
     tempArr2 = guessesSnap.data().guessArray;
     for (let i = 0; i < tempArr2.length; i++) {
-      if (tempArr2[i].modulecode === obj.modulecode &&
+      if (
+        tempArr2[i].modulecode === obj.modulecode &&
         tempArr2[i].academicyear === obj.academicyear &&
         tempArr2[i].term === obj.term &&
-        tempArr2[i].creatoruid === obj.creatoruid) {
+        tempArr2[i].creatoruid === obj.creatoruid
+      ) {
         newArr2.push({
           modulecode: tempArr2[i].modulecode,
           academicyear: tempArr2[i].academicyear,
@@ -442,15 +459,109 @@ function Play(props) {
           boxstate4: instantBox4,
           boxstate5: instantBox5,
           boxstate6: instantBox6,
-          solvedstate: instantSolved
-        })
-
+          solvedstate: instantSolved,
+        });
       } else {
         newArr2.push(tempArr2[i]);
       }
     }
     setDoc(guessesDocRef, { guessArray: newArr2 }, { merge: true });
-  }
+  };
+
+  // ref to modules collection
+  const { documents: userprofiles } = useCollection("userprofiles", [
+    "uid",
+    "==",
+    user.uid,
+  ]);
+
+  const setRankingCollection = async (num, answerkey, displaytime, comparetime) => {
+    console.log("entered ranking collection");
+    //creating reference to the fortheday collection
+    const forthedayRef = collection(db, "fortheday");
+    //creating query against the fortheday collection
+    const forthedayQuery = query(
+      forthedayRef,
+      where("modulecode", "==", obj.modulecode),
+      where("ay", "==", obj.academicyear),
+      where("term", "==", obj.term),
+      where("creatoruid", "==", obj.creatoruid)
+    );
+    //executing the fortheday query
+    const forthedaySnapshot = await getDocs(forthedayQuery);
+    //storing it in a variable
+    var todayObj;
+    forthedaySnapshot.forEach((file) => {
+      todayObj = file.data();
+    });
+
+    // console.log(todayObj.questionid + " this is questionid");
+    // console.log(obj.modulecode + " this is modcode");
+    // console.log(obj.academicyear + " this is ay");
+    // console.log(obj.term + " this is temr");
+    // console.log(obj.creatoruid + " creatoruid");
+    const rankingRef = doc(
+      db,
+      "modules",
+      obj.modulecode,
+      obj.academicyear,
+      obj.term,
+      obj.creatoruid,
+      todayObj.questionid,
+      "ranking",
+      user.uid
+    );
+
+    //Solved is either completed within 6 tries or failed
+    let numOfTries = 0;
+    let triesArray = [];
+
+    if (num === 1) {
+      //Only took 1 try
+      numOfTries = 1;
+      triesArray = [true, null, null, null, null, null];
+    } else if (num === 2) {
+      //Only took 2 tries
+      numOfTries = 2;
+      triesArray = [false, true, null, null, null, null];
+    } else if (num === 3) {
+      //Only took 3 tries
+      numOfTries = 3;
+      triesArray = [false, false, true, null, null, null];
+    } else if (num === 4) {
+      //Only took 4 tries
+      numOfTries = 4;
+      triesArray = [false, false, false, true, null, null];
+    } else if (num === 5) {
+      //Only took 5 tries
+      numOfTries = 5;
+      triesArray = [false, false, false, false, true, null];
+    } else if (num === 6) {
+      if (answerkey !== input6) {
+        //Still wrong after 6 tries
+        numOfTries = 7; //We set here to 7 because the user did not guess/attempt it correctly
+        triesArray = [false, false, false, false, false, false];
+      } else {
+        numOfTries = 6;
+        triesArray = [false, false, false, false, false, true];
+      }
+    }
+
+    var username;
+    userprofiles.map((x) => (username = x.username));
+
+    setDoc(
+      rankingRef,
+      {
+        username: username,
+        displaytime: displaytime,
+        comparetime: comparetime,
+        tries: triesArray,
+        numtries: numOfTries,
+      },
+      { merge: true }
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -462,7 +573,7 @@ function Play(props) {
           checkError(input1);
           setBox1(true);
           paintingKeys(input1, chosenQn.answer);
-          stopAfterCorrect(input1, chosenQn.answer, setBox2);
+          stopAfterCorrect(input1, chosenQn.answer, setBox2, 1);
           instantBox1 = true;
           if (input1 === chosenQn.answer) {
             instantSolved = true;
@@ -473,7 +584,7 @@ function Play(props) {
           checkError(input2);
           setBox2(true);
           paintingKeys(input2, chosenQn.answer);
-          stopAfterCorrect(input2, chosenQn.answer, setBox3);
+          stopAfterCorrect(input2, chosenQn.answer, setBox3, 2);
           instantBox2 = true;
           if (input2 === chosenQn.answer) {
             instantSolved = true;
@@ -484,7 +595,7 @@ function Play(props) {
           checkError(input3);
           setBox3(true);
           paintingKeys(input3, chosenQn.answer);
-          stopAfterCorrect(input3, chosenQn.answer, setBox4);
+          stopAfterCorrect(input3, chosenQn.answer, setBox4, 3);
           instantBox3 = true;
           if (input3 === chosenQn.answer) {
             instantSolved = true;
@@ -495,7 +606,7 @@ function Play(props) {
           checkError(input4);
           setBox4(true);
           paintingKeys(input4, chosenQn.answer);
-          stopAfterCorrect(input4, chosenQn.answer, setBox5);
+          stopAfterCorrect(input4, chosenQn.answer, setBox5, 4);
           instantBox4 = true;
           if (input4 === chosenQn.answer) {
             instantSolved = true;
@@ -506,7 +617,7 @@ function Play(props) {
           checkError(input5);
           setBox5(true);
           paintingKeys(input5, chosenQn.answer);
-          stopAfterCorrect(input5, chosenQn.answer, setBox6);
+          stopAfterCorrect(input5, chosenQn.answer, setBox6, 5);
           instantBox5 = true;
           if (input5 === chosenQn.answer) {
             instantSolved = true;
@@ -517,7 +628,7 @@ function Play(props) {
           checkError(input6);
           setBox6(true);
           paintingKeys(input6, chosenQn.answer);
-          stopAfterCorrect(input6, chosenQn.answer, null);
+          stopAfterCorrect(input6, chosenQn.answer, null, 6);
           instantBox6 = true;
           instantSolved = true;
           console.log("Done with 6 tries!");
@@ -558,7 +669,7 @@ function Play(props) {
             checkError(input1);
             setBox1(true);
             paintingKeys(input1, chosenQn.answer);
-            stopAfterCorrect(input1, chosenQn.answer, setBox2);
+            stopAfterCorrect(input1, chosenQn.answer, setBox2, 1);
             instantBox1 = true;
             if (input1 === chosenQn.answer) {
               instantSolved = true;
@@ -569,7 +680,7 @@ function Play(props) {
             checkError(input2);
             setBox2(true);
             paintingKeys(input2, chosenQn.answer);
-            stopAfterCorrect(input2, chosenQn.answer, setBox3);
+            stopAfterCorrect(input2, chosenQn.answer, setBox3, 2);
             instantBox2 = true;
             if (input2 === chosenQn.answer) {
               instantSolved = true;
@@ -580,7 +691,7 @@ function Play(props) {
             checkError(input3);
             setBox3(true);
             paintingKeys(input3, chosenQn.answer);
-            stopAfterCorrect(input3, chosenQn.answer, setBox4);
+            stopAfterCorrect(input3, chosenQn.answer, setBox4, 3);
             instantBox3 = true;
             if (input3 === chosenQn.answer) {
               instantSolved = true;
@@ -591,7 +702,7 @@ function Play(props) {
             checkError(input4);
             setBox4(true);
             paintingKeys(input4, chosenQn.answer);
-            stopAfterCorrect(input4, chosenQn.answer, setBox5);
+            stopAfterCorrect(input4, chosenQn.answer, setBox5, 4);
             instantBox4 = true;
             if (input4 === chosenQn.answer) {
               instantSolved = true;
@@ -602,7 +713,7 @@ function Play(props) {
             checkError(input5);
             setBox5(true);
             paintingKeys(input5, chosenQn.answer);
-            stopAfterCorrect(input5, chosenQn.answer, setBox6);
+            stopAfterCorrect(input5, chosenQn.answer, setBox6, 5);
             instantBox5 = true;
             if (input5 === chosenQn.answer) {
               instantSolved = true;
@@ -613,13 +724,12 @@ function Play(props) {
             checkError(input6);
             setBox6(true);
             paintingKeys(input6, chosenQn.answer);
-            stopAfterCorrect(input6, chosenQn.answer, null);
+            stopAfterCorrect(input6, chosenQn.answer, null, 6);
             instantBox6 = true;
             instantSolved = true;
             console.log("Done with 6 tries!");
           }
           setGuessCollection();
-
         } catch (e) {
           setError(e);
           console.error(e);
@@ -644,13 +754,15 @@ function Play(props) {
   }
 
   function textCreator(userInput, answerKey) {
-    const colorArray = AnswerChecker(userInput, answerKey);
+    const colorArray = InputChecker(userInput, answerKey);
+    
+    //output of answerchecker is [["colortoPaint", "inputLetter_one"], ["colortoPaint", "inputLetter_two"], ...]
     var keyID = 0;
     return colorArray.map((x) => {
       keyID++;
       return (
-        <Text key={keyID} color={x[0]} fontSize="2.083vw" fontWeight="bold">
-          {x[1]}
+        <Text key={keyID} color={x[1]} fontSize="2.083vw" fontWeight="bold">
+          {x[0]}
         </Text>
       );
     });
@@ -662,7 +774,6 @@ function Play(props) {
   // if false: choose this question by setting temp variable and set setBefore as true --> break out of for loop
   // using the temp variable, set the qn, hint, answer, no. of letters [json object already]
 
-
   // var tempArr1 = [];
   // var newArr1 = [];
   const doDuringMidnight = async () => {
@@ -672,38 +783,41 @@ function Play(props) {
       setDoc(currentDoc, { resetBefore: false }, { merge: true });
     });
 
-     const guessesRef = await getDocs(collection(db, "guesses"));
-     guessesRef.forEach((docs) => {
+    const guessesRef = await getDocs(collection(db, "guesses"));
+    guessesRef.forEach((docs) => {
       var tempArr1 = [];
       var newArr1 = [];
       tempArr1 = docs.data().guessArray;
       for (let i = 0; i < tempArr1.length; i++) {
-            newArr1.push({
-              modulecode: tempArr1[i].modulecode,
-              academicyear: tempArr1[i].academicyear,
-              term: tempArr1[i].term,
-              creatoruid: tempArr1[i].creatoruid,
-              guessBefore: false,
-              guess1: "",
-              guess2: "",
-              guess3: "",
-              guess4: "",
-              guess5: "",
-              guess6: "",
-              boxstate1: false,
-              boxstate2: true,
-              boxstate3: true,
-              boxstate4: true,
-              boxstate5: true,
-              boxstate6: true,
-              solvedstate: false,
-            })
-          }
-          setDoc(doc(db, "guesses", docs.id), { guessArray: newArr1 }, { merge: true });
-     })
-    
-    
-     // const guessesSnap = await getDoc(guessesDocRef);
+        newArr1.push({
+          modulecode: tempArr1[i].modulecode,
+          academicyear: tempArr1[i].academicyear,
+          term: tempArr1[i].term,
+          creatoruid: tempArr1[i].creatoruid,
+          guessBefore: false,
+          guess1: "",
+          guess2: "",
+          guess3: "",
+          guess4: "",
+          guess5: "",
+          guess6: "",
+          boxstate1: false,
+          boxstate2: true,
+          boxstate3: true,
+          boxstate4: true,
+          boxstate5: true,
+          boxstate6: true,
+          solvedstate: false,
+        });
+      }
+      setDoc(
+        doc(db, "guesses", docs.id),
+        { guessArray: newArr1 },
+        { merge: true }
+      );
+    });
+
+    // const guessesSnap = await getDoc(guessesDocRef);
     // if (guessesSnap.exists()) {
     //   console.log("resetting all the guesses at midnight")
     //   tempArr1 = guessesSnap.data().guessArray;
@@ -732,7 +846,7 @@ function Play(props) {
     //   setDoc(guessesDocRef, { guessArray: newArr1 }, { merge: true });
     // }
     // window.location.reload(true);
-  }
+  };
 
   var placeholderArr = [];
   const handleClick = async () => {
@@ -754,11 +868,10 @@ function Play(props) {
     var todayObj;
     forthedaySnapshot.forEach((file) => {
       todayObj = file;
-    })
-
+    });
 
     const getQuestion = async () => {
-      console.log("Getting question")
+      console.log("Getting question");
       const querySnapshot = await getDocs(
         collection(
           db,
@@ -801,28 +914,33 @@ function Play(props) {
               answer: helperArr[i].data().answer,
               hint: helperArr[i].data().hint,
               explanation: helperArr[i].data().explanation,
-              resetBefore: true
-            })
+              resetBefore: true,
+              questionid: helperArr[i].id,
+            });
           } else {
-            const forTheDayObj = doc(db, "fortheday", todayObj.id)
-            setDoc(forTheDayObj, {
-              question: helperArr[i].data().question,
-              answer: helperArr[i].data().answer,
-              hint: helperArr[i].data().hint,
-              explanation: helperArr[i].data().explanation,
-              resetBefore: true
-            }, { merge: true })
+            const forTheDayObj = doc(db, "fortheday", todayObj.id);
+            setDoc(
+              forTheDayObj,
+              {
+                question: helperArr[i].data().question,
+                answer: helperArr[i].data().answer,
+                hint: helperArr[i].data().hint,
+                explanation: helperArr[i].data().explanation,
+                resetBefore: true,
+                questionid: helperArr[i].id,
+              },
+              { merge: true }
+            );
           }
 
           break;
         }
       }
-    }
+    };
 
     if (todayObj === undefined || !todayObj.data().resetBefore) {
       getQuestion();
     }
-
 
     //for guesses collection
     const guessesSnap = await getDoc(guessesDocRef);
@@ -831,10 +949,12 @@ function Play(props) {
     if (guessesSnap.exists()) {
       placeholderArr = guessesSnap.data().guessArray;
       for (let i = 0; i < placeholderArr.length; i++) {
-        if (placeholderArr[i].modulecode === obj.modulecode &&
+        if (
+          placeholderArr[i].modulecode === obj.modulecode &&
           placeholderArr[i].academicyear === obj.academicyear &&
           placeholderArr[i].term === obj.term &&
-          placeholderArr[i].creatoruid === obj.creatoruid) {
+          placeholderArr[i].creatoruid === obj.creatoruid
+        ) {
           const bool = placeholderArr[i].guessBefore;
           newComer = false;
           if (bool) {
@@ -879,35 +999,40 @@ function Play(props) {
           boxstate4: true,
           boxstate5: true,
           boxstate6: true,
-          solvedstate: false
-        })
+          solvedstate: false,
+        });
         setDoc(guessesDocRef, { guessArray: placeholderArr }, { merge: true });
       }
-
-    } else { //If user first time playing nudles (newcomer)
-      setDoc(guessesDocRef, {
-        guessArray: [{
-          modulecode: obj.modulecode,
-          academicyear: obj.academicyear,
-          term: obj.term,
-          creatoruid: obj.creatoruid,
-          guessBefore: false,
-          guess1: "",
-          guess2: "",
-          guess3: "",
-          guess4: "",
-          guess5: "",
-          guess6: "",
-          boxstate1: false,
-          boxstate2: true,
-          boxstate3: true,
-          boxstate4: true,
-          boxstate5: true,
-          boxstate6: true,
-          solvedstate: false
-        }]
-      },
-        { merge: true })
+    } else {
+      //If user first time playing nudles (newcomer)
+      setDoc(
+        guessesDocRef,
+        {
+          guessArray: [
+            {
+              modulecode: obj.modulecode,
+              academicyear: obj.academicyear,
+              term: obj.term,
+              creatoruid: obj.creatoruid,
+              guessBefore: false,
+              guess1: "",
+              guess2: "",
+              guess3: "",
+              guess4: "",
+              guess5: "",
+              guess6: "",
+              boxstate1: false,
+              boxstate2: true,
+              boxstate3: true,
+              boxstate4: true,
+              boxstate5: true,
+              boxstate6: true,
+              solvedstate: false,
+            },
+          ],
+        },
+        { merge: true }
+      );
     }
 
     // const getQuestion = async () => {
@@ -981,13 +1106,13 @@ function Play(props) {
     var todayObj2;
     forthedaySnapshot2.forEach((file) => {
       todayObj2 = file;
-    })
+    });
 
     setChosenQn({
       question: todayObj2.data().question,
       answer: todayObj2.data().answer,
       hint: todayObj2.data().hint,
-      explanation: todayObj2.data().explanation
+      explanation: todayObj2.data().explanation,
     });
     setClickBefore(true);
     //window.location.reload();
@@ -997,7 +1122,6 @@ function Play(props) {
     <div className="background6">
       <TopBarV2 />
       {!clickBefore ? (
-
         //////////////////////////////if never click before/////////////////////////
 
         <Center textAlign="center" minHeight="100vh">
@@ -1029,9 +1153,7 @@ function Play(props) {
             Double-Click to Play
           </Box>
         </Center>
-
       ) : playBefore ? (
-
         //////////////////////////////Clicked before && if play before/////////////////////////
 
         <Box minHeight="100vh">
@@ -1044,11 +1166,7 @@ function Play(props) {
             >
               <Box marginBottom="1vw">
                 <HStack>
-                  <Text
-                    align="left"
-                    fontSize="1.500vw"
-                    fontWeight="bold"
-                  >
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
                     {obj.modulecode}
                   </Text>
                   <Text align="left" fontSize="1.500vw" fontWeight="bold">
@@ -1059,10 +1177,21 @@ function Play(props) {
                   </Text>
                 </HStack>
               </Box>
-              <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
+              <Text
+                as="u"
+                align="left"
+                fontSize="1.300vw"
+                fontWeight="bold"
+                textColor="#686B6F"
+              >
                 Question
               </Text>
-              <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+              <Text
+                align="left"
+                fontSize="1.250vw"
+                fontWeight="bold"
+                textColor="#686B6F"
+              >
                 {chosenQn.question}
               </Text>
 
@@ -1330,7 +1459,6 @@ function Play(props) {
           <Box height="3vw" />
         </Box>
       ) : (
-
         //////////////////////////////Click before && if never play before/////////////////////////
 
         <Box minHeight="100vh">
@@ -1343,11 +1471,7 @@ function Play(props) {
             >
               <Box marginBottom="1vw">
                 <HStack>
-                  <Text
-                    align="left"
-                    fontSize="1.500vw"
-                    fontWeight="bold"
-                  >
+                  <Text align="left" fontSize="1.500vw" fontWeight="bold">
                     {obj.modulecode}
                   </Text>
                   <Text align="left" fontSize="1.500vw" fontWeight="bold">
@@ -1358,10 +1482,21 @@ function Play(props) {
                   </Text>
                 </HStack>
               </Box>
-              <Text as="u" align="left" fontSize="1.300vw" fontWeight="bold" textColor="#686B6F">
+              <Text
+                as="u"
+                align="left"
+                fontSize="1.300vw"
+                fontWeight="bold"
+                textColor="#686B6F"
+              >
                 Question
               </Text>
-              <Text align="left" fontSize="1.250vw" fontWeight="bold" textColor="#686B6F">
+              <Text
+                align="left"
+                fontSize="1.250vw"
+                fontWeight="bold"
+                textColor="#686B6F"
+              >
                 {chosenQn.question}
               </Text>
 
@@ -1614,6 +1749,16 @@ function Play(props) {
             colorX={colorX}
             colorY={colorY}
             colorZ={colorZ}
+            colorOne={colorOne}
+            colorTwo={colorTwo}
+            colorThree={colorThree}
+            colorFour={colorFour}
+            colorFive={colorFive}
+            colorSix={colorSix}
+            colorSeven={colorSeven}
+            colorEight={colorEight}
+            colorNine={colorNine}
+            colorZero={colorZero}
           />
 
           <Box height="3vw" />
@@ -1621,7 +1766,6 @@ function Play(props) {
       )}
     </div>
   );
-
 }
 
 export default Play;

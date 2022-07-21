@@ -1,16 +1,37 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600");
 
 .background3 {
-    background-color: #fff;
-    background-image:
-        linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px),
-        linear-gradient(#eee .1em, transparent .1em);
-    background-size: 100% 1.2em;
+  background-color: #fff;
+  background-image: linear-gradient(
+      90deg,
+      transparent 79px,
+      #abced4 79px,
+      #abced4 81px,
+      transparent 81px
+    ),
+    linear-gradient(#eee 0.1em, transparent 0.1em);
+  background-size: 100% 1.2em;
 }
 
 .background6 {
-    background-color: #ffffff;
-    opacity: 1;
-    background-size: 26px 26px;
-    background-image: repeating-linear-gradient(0deg, #83C5BE, #83C5BE 1.3px, #ffffff 1.3px, #ffffff);
+  background-color: #ffffff;
+  opacity: 1;
+  background-size: 26px 26px;
+  background-image: repeating-linear-gradient(
+    0deg,
+    #83c5be,
+    #83c5be 1.3px,
+    #ffffff 1.3px,
+    #ffffff
+  );
+}
+.new-background {
+  background-color: #a1dddd;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+  justify-items: center;
+  align-items: center;
+  z-index: 2;
+  box-shadow: 4px 5px 5px 1px rgba(0, 0, 0, 0.24);
 }

@@ -6,6 +6,7 @@ import {
   VStack,
   SimpleGrid,
   Image,
+  Button
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase/config";
@@ -19,6 +20,7 @@ function ModulesDisplay() {
   const { user } = useAuthContext();
   const [buttonclick, setButtonClick] = useState(false);
   const [likedArray, setLikedArray] = useState("");
+  const [disable, setDisable] = useState(true);
 
   var helperArr = [];
   var newArr = [];
@@ -51,7 +53,7 @@ function ModulesDisplay() {
     const docSnap = await getDoc(docRef);
     setLikedArray("");
     if (docSnap.exists()) {
-      console.log("document exist");
+      // console.log("document exist");
       helperArr = docSnap.data().modarray;
       setLikedArray(helperArr);
     }
@@ -97,9 +99,15 @@ function ModulesDisplay() {
       await setDoc(ref, { modarray: res });
     }
   };
+  
+  const handleEdit = () => {
+    setDisable(!disable);
+  }
+    
+  
 
   return (
-    <div>
+    <>
       <Box margin="3% 4% 0%">
         <Box marginBottom="2vw" alignItems="left">
           <HStack spacing="3vw">
@@ -122,28 +130,72 @@ function ModulesDisplay() {
               borderRadius="10px"
               fontSize="1.2vw"
               fontWeight="semibold"
-              bg="#F7B556"
+              bg={!buttonclick ? "#F7B556" : "#D4A373"}
               borderColor=""
-              color="#000000"
-              _hover={{ bg: "#DBA14D" }}
-              _active={{
+              color={!buttonclick ? "#000000" : "#FFFFFF"}
+              _hover={!buttonclick ? { bg: "#DBA14D" } : {bg: "#C0956B"}}
+              _active={!buttonclick ? {
                 bg: "#F7B556",
                 transform: "scale(0.98)",
                 borderColor: "",
-              }}
+              }
+              :
+              {
+                bg: "#D4A373",
+                transform: "scale(0.98)",
+                borderColor: "",
+              }
+              }
               _focus={{
                 boxShadow:
                   "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
               }}
               onClick={handleClick}
             >
-              Show Modules
+              {!buttonclick ? "Show Modules" : "Hide Modules"}
             </Box>
           </HStack>
         </Box>
 
         {buttonclick ? (
           likedArray.toString() !== "" ? (
+            <>
+            <Box
+              as="button"
+              height="3vw"
+              lineHeight="1.2"
+              transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+              border="0px"
+              width="12vw"
+              borderRadius="10px"
+              fontSize="1.2vw"
+              fontWeight="semibold"
+              bg={disable ? "#E5E5E5" : "#8FBA86"}
+              borderColor=""
+              color= {disable ? "#000000" : "#ffffff"}
+              _hover={disable ? { bg: "#BFBFBF" } : { bg: "#82A77A" }}
+              _active={disable ? {
+                bg: "#E5E5E5",
+                transform: "scale(0.98)",
+                borderColor: "",
+              }
+              :
+              {
+                bg: "#8FBA86",
+                transform: "scale(0.98)",
+                borderColor: "",
+              }
+              }
+
+              _focus={{
+                boxShadow:
+                  "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+              }}
+              marginBottom="2vw"
+              onClick={handleEdit}
+            >
+              {disable ? "Edit Modules" : "Done Editing"}
+            </Box>
             <SimpleGrid columns={4} spacing="3vw">
               {likedArray.map((obj, index) => (
                 <HStack spacing="0" key={index}>
@@ -220,8 +272,8 @@ function ModulesDisplay() {
                       </Tooltip>
                     </Box>
                   </Link>
-                  <Box
-                    as="button"
+                  <Button
+                    // as="button"
                     height="8.333vw"
                     lineHeight="1.2"
                     transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
@@ -245,15 +297,17 @@ function ModulesDisplay() {
                     }}
                     padding="0.3vw"
                     onClick={() => {handleDelete(obj.academicyear, obj.creatoruid, obj.creatorusername, obj.modulecode, obj.modulename, obj.term)}}
+                    isDisabled={disable}
                   >
                     <Image
                       src={deleteButton}
                       alt="Delete-button"
                     />
-                  </Box>
+                  </Button>
                 </HStack>
               ))}
             </SimpleGrid>
+            </>
           ) : (
             <Box textAlign="left">
               <Text
@@ -298,7 +352,7 @@ function ModulesDisplay() {
           )
         ) : null}
       </Box>
-    </div>
+    </>
   );
 }
 

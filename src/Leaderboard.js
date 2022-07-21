@@ -33,6 +33,8 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 
 // importing our firestore database object
@@ -46,29 +48,6 @@ function Leaderboard() {
   const [error, setError] = useState(null);
   const [resultArr, setResultArr] = useState("");
 
-  function ModuleNameAPI(props) {
-    const nusmodsAPI =
-      "https://api.nusmods.com/v2/" +
-      formatYear(props.ay) +
-      "/modules/" +
-      props.mc +
-      ".json";
-    const [moduleName, setModuleName] = useState("Loading.....");
-    useEffect(() => {
-      fetch(nusmodsAPI)
-        .then((response) => response.json())
-        .then((data) => setModuleName(data.title))
-        .catch((error) =>
-          setModuleName(`Unable to retrieve Module Name: ${error}`)
-        );
-    }, []);
-
-    return moduleName;
-  }
-
-  function formatYear(acadyear) {
-    return "20" + acadyear.substring(0, 3) + "20" + acadyear.substring(3);
-  }
 
   function checkSearchInput(acadYear) {
     if (
@@ -107,17 +86,17 @@ function Leaderboard() {
 
       //executing the query
       const qnCollectionQuerySnapshot = await getDocs(qnCollectionQuery);
-      qnCollectionQuerySnapshot.forEach((doc) => {
+      qnCollectionQuerySnapshot.forEach((docs) => {
         hasEntered = true;
-        if (!setUnique.has(doc.data().uid)) {
-          setUnique.add(doc.data().uid);
+        if (!setUnique.has(docs.data().uid)) {
+          setUnique.add(docs.data().uid);
 
           //creating secondary reference to another collection in firestore --> userprofiles
           const userprofilesRef = collection(db, "userprofiles");
           //creating secondary Query to userprofiles collection
           const userprofilesQuery = query(
             userprofilesRef,
-            where("uid", "==", doc.data().uid)
+            where("uid", "==", docs.data().uid)
           );
 
           let usernamePlaceholder;
@@ -125,16 +104,39 @@ function Leaderboard() {
             //executing the secondary query
             const ref = await getDocs(userprofilesQuery);
             ref.forEach((file) => (usernamePlaceholder = file.data().username));
+            const modulename = await getModuleName();
 
             helperArr.push({
-              modcode: doc.data().module,
+              modcode: docs.data().module,
               createdby: usernamePlaceholder,
-              ay: doc.data().academicyear,
-              term: doc.data().term,
-              creatoruid: doc.data().uid
+              ay: docs.data().academicyear,
+              term: docs.data().term,
+              creatoruid: docs.data().uid,
+              modulename: modulename
             });
 
             setResultArr(helperArr);
+          };
+
+          const getModuleName = async () => {
+            const documentRef = doc(
+              db,
+              "modules",
+              docs.data().module,
+              docs.data().academicyear,
+              docs.data().term
+            );
+
+            const documentSnap = await getDoc(documentRef);
+
+            if (documentSnap.exists()) {
+              console.log(
+                documentSnap.data()[docs.data().uid] + " is the fieldname in getModuleName"
+              );
+              return documentSnap.data()[docs.data().uid];
+            } else {
+              console.log("No such document!");
+            }
           };
           hello();
         }
@@ -182,30 +184,6 @@ function Leaderboard() {
                   value={modulecode.toUpperCase()}
                   fontSize="1.2vw"
                 />
-
-                {/* <Box>
-                  <Text
-                    fontSize="1.5vw"
-                    fontWeight="semibold"
-                    color="#000000"
-                    lineHeight="1.3"
-                    align="left"
-                  >
-                    ACADEMIC YEAR
-                  </Text>
-                </Box> */}
-                {/* <Field
-                  as={Input}
-                  id="modulecode"
-                  name="academic year"
-                  variant="filled"
-                  width="9vw"
-                  height="1.875vw"
-                  placeholder="E.g. 21-22"
-                  onChange={(e) => setAcademicYear(e.target.value)}
-                  value={academicyear}
-                /> */}
-                {/* new dropdown for the searches */}
 
                 <Select
                   variant="filled"
@@ -391,9 +369,7 @@ function Leaderboard() {
 
                 <Tooltip
                   label={
-                    <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                      {" "}
-                    </ModuleNameAPI>
+                    element.modulename
                   }
                 >
                   <Container
@@ -409,9 +385,7 @@ function Leaderboard() {
                       fontSize="1.5vw"
                       noOfLines={1}
                     >
-                      <ModuleNameAPI ay={element.ay} mc={element.modcode}>
-                        {" "}
-                      </ModuleNameAPI>
+                      {element.modulename}
                     </Text>
                   </Container>
                 </Tooltip>

@@ -66,7 +66,6 @@ function UpdateInputQuestion() {
     try {
       checkError(answer);
       const name = await usingapi(academicyear, modulecode.toUpperCase());
-      console.log(name + "15 july 11pm");
 
       if (name === null) {
         console.log("name is empty");

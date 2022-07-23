@@ -36,6 +36,7 @@ function LoginFields() {
               variant="filled"
               placeholder="Email Address"
               onChange={(e) => setEmail(e.target.value)}
+              data-testid = "emailInput"
             />
           </FormControl>
           <FormControl isRequired>
@@ -47,6 +48,7 @@ function LoginFields() {
               placeholder="Password"
               variant="filled"
               onChange={(e) => setPassword(e.target.value)}
+              data-testid = "passwordInput"
             />
           </FormControl>
           <Box
@@ -72,6 +74,7 @@ function LoginFields() {
               boxShadow:
                 "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
             }}
+            data-testid = "submitButton"
           >
             Login
           </Box>

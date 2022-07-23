@@ -50,18 +50,18 @@ function Leaderboard() {
   const [resultArr, setResultArr] = useState("");
   const [stillsearching, setStillSearching] = useState("hidden");
 
-  function checkSearchInput(acadYear) {
-    if (
-      acadYear.includes("/") ||
-      acadYear.includes(" ") ||
-      !acadYear.includes("-") ||
-      acadYear.length !== 5
-    ) {
-      throw Error(
-        "Academic Year should be in the format 21-22 separated by a dash"
-      );
-    }
-  }
+  // function checkSearchInput(acadYear) {
+  //   if (
+  //     acadYear.includes("/") ||
+  //     acadYear.includes(" ") ||
+  //     !acadYear.includes("-") ||
+  //     acadYear.length !== 5
+  //   ) {
+  //     throw Error(
+  //       "Academic Year should be in the format 21-22 separated by a dash"
+  //     );
+  //   }
+  // }
 
   var helper = [];
 
@@ -72,7 +72,9 @@ function Leaderboard() {
     setStillSearching("visible");
 
     try {
-      checkSearchInput(academicyear);
+      // checkSearchInput(academicyear); Can remove 
+
+
       //creating reference to the questions collection in our firestore database
       const questionsRef = collection(db, "questions");
       //creating query against the questions collection

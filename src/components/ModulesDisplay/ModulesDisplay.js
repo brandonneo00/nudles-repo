@@ -6,6 +6,10 @@ import {
   SimpleGrid,
   Image,
   Button,
+  ButtonGroup,
+  VStack,
+  IconButton,
+  Icon,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase/config";
@@ -13,7 +17,9 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import { useState } from "react";
 import deleteButton from "../../images/bin.png";
+import rankingButton from "../../images/ranking.png";
 import _ from "lodash";
+import "./ModulesDisplay.css";
 
 function ModulesDisplay() {
   const { user } = useAuthContext();
@@ -74,6 +80,9 @@ function ModulesDisplay() {
       await setDoc(ref, { modarray: res });
     }
   };
+  const handleRoute = () => {
+    
+  }
 
   const handleEdit = () => {
     setDisable(!disable);
@@ -248,12 +257,15 @@ function ModulesDisplay() {
                         </Tooltip>
                       </Box>
                     </Link>
+                    {/* <VStack spacing="0" paddingTop="0rem"> */}
+                    <ButtonGroup flexDirection="column" isAttached>
                     <Button
-                      height="8.333vw"
+                      height="4.1665vw"
                       lineHeight="1.2"
                       transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
                       border="0px"
-                      borderRightRadius="15px"
+                      borderTopRightRadius="15px"
+                      borderBottomRightRadius="0px"
                       borderLeftRadius="0px"
                       fontSize="1.2vw"
                       fontWeight="semibold"
@@ -270,9 +282,11 @@ function ModulesDisplay() {
                         boxShadow:
                           "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
                       }}
-                      padding="0.3vw"
+                      padding="0.5vw"
+                      as={IconButton}
+                      icon={<Image src={deleteButton} alt="delete-logo" boxSize="2vw" />}
                       onClick={() => {
-                        handleDelete(
+                        handleRoute(
                           obj.academicyear,
                           obj.creatoruid,
                           obj.creatorusername,
@@ -283,8 +297,54 @@ function ModulesDisplay() {
                       }}
                       isDisabled={disable}
                     >
-                      <Image src={deleteButton} alt="Delete-button" />
+                      {/* <Image src={deleteButton} alt="Delete-button" /> */}
                     </Button>
+                    <Link to={{
+                    pathname: "/Ranking",
+                    state: { obj: {
+                      modcode: obj.modulecode,
+                      modulename: obj.modulename,
+                      ay: obj.academicyear,
+                      term: obj.term,
+                      createdby: obj.creatorusername,
+                      creatoruid: obj.creatoruid,
+                    } },
+                  }}>
+                  
+                    <Button
+                      height="4.1665vw"
+                      lineHeight="1.2"
+                      transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+                      border="0px"
+                      borderTopRightRadius="0px"
+                      borderBottomRightRadius="15px"
+                      borderLeftRadius="0px"
+                      fontSize="1.2vw"
+                      fontWeight="semibold"
+                      bg="#DBEEFF"
+                      borderColor=""
+                      color="#000000"
+                      _hover={{ bg: "#C9DBEC" }}
+                      _active={{
+                        bg: "#DBEEFF",
+                        transform: "scale(0.98)",
+                        borderColor: "",
+                      }}
+                      _focus={{
+                        boxShadow:
+                          "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
+                      }}
+                      padding="0.5vw"
+                      as={IconButton}
+                      icon={<Image src={rankingButton} alt="leaderboard-logo" boxSize="2.5vw" />}
+                    >
+                      {/* <Image className="rankingbutton" src={rankingButton} alt="leaderboard-button"/> */}
+                      {/* <img className="rankingbutton" src={rankingButton} alt="leaderboard-button"/> */}
+                    </Button>
+                
+                    </Link>
+                    </ButtonGroup>
+                    {/* </VStack> */}
                   </HStack>
                 ))}
               </SimpleGrid>

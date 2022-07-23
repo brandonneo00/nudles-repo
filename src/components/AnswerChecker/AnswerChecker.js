@@ -10,18 +10,18 @@ function AnswerChecker(userInput, correctAns) {
     colorArray[i] = [];
     const userLetter = userInput.charAt(i);
     const ansLetter = correctAns.charAt(i);
-    console.log(ansLetter);
+    // console.log(ansLetter);
     if (userLetter === ansLetter) {
-      console.log("Green");
+      // console.log("Green");
       colorArray[i].push(greenColor);
       colorArray[i].push(userLetter);
     } else {
       if (correctAns.includes(userLetter)) {
-        console.log("Orange");
+        // console.log("Orange");
         colorArray[i].push(orangeColor);
         colorArray[i].push(userLetter);
       } else {
-        console.log("Grey");
+        // console.log("Grey");
         colorArray[i].push(greyColor);
         colorArray[i].push(userLetter);
       }

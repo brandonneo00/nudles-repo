@@ -6,7 +6,6 @@ import { auth } from "../firebase/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { signOut } from "firebase/auth";
 
-
 test("useLogin", async () => {
   // const [error, setError] = useState(null);
   // const { dispatch } = useAuthContext();
@@ -15,11 +14,16 @@ test("useLogin", async () => {
   //Sample inputs for the various accounts to test logging in and out
   //of the web application
   const sampleAccounts = [
-    ["darktest2@gmail.com", "123456"], //Sample Existing Account
-    ["helloitsme@adele.com", "helloitsme"], //Fake Account
-    ["serious@serious.com", "password"], //Sample Existing Account
-    ["goodbyemylover@gmail.com", "goodbyemyfriend"], //Fake Account
-    ["blah@gmail.com", "password"] //Fake Account
+    ["", ""], //Empty fields
+    ["serious@serious.com", ""], //Existing Account with no password
+    ["", "password"], //Empty email field with password
+    ["darktest2@gmail.com", "123456"], //Existing Account
+    ["serious@serious.com", "passwor"], //Existing Account with wrong password
+    ["serious@serious.com", "password"], //Existing Account with correct password
+    ["helloitsme@adele.com", "helloitsme"], //Non-existent Account
+    ["goodbye@gmail.com", "goodbye"], //Non-existent Account
+    ["blah@gmail.com", "password"], //Non-existent Account
+    ["nixnix@gmail.com", "nausnaus"] //Non-existent Accoun
   ];
 
   var resultArray = [];
@@ -27,12 +31,17 @@ test("useLogin", async () => {
   //Each item in the expectedOutcome array represents the following
   //[loggedIn, loggedOut], [loggedIn, loggedOut], ...
   var expectedOutcome = [
-    [true, true],
+    [false, false],
+    [false, false],
     [false, false],
     [true, true],
     [false, false],
-    [false, false]];
-
+    [true, true],
+    [false, false],
+    [false, false],
+    [false, false],
+    [false, false],
+  ];
 
   //We modfied the versions for login and logout function as react useState do not work well
   //with the jest testing library, we retained the core functionality of the code while commenting out the
@@ -70,7 +79,7 @@ test("useLogin", async () => {
   };
 
   const logout = async () => {
-    var loggedOut = false
+    var loggedOut = false;
     await signOut(auth)
       .then(() => {
         // dispatch({ type: "LOGOUT" });
@@ -83,13 +92,11 @@ test("useLogin", async () => {
     return loggedOut;
   };
 
-  
-
   for (let i = 0; i < sampleAccounts.length; i++) {
     const email = sampleAccounts[i][0];
     const password = sampleAccounts[i][1];
     const outcome = await login(email, password);
-    var tempArray = []
+    var tempArray = [];
     tempArray[0] = outcome;
     if (outcome) {
       const finishLogout = await logout();
@@ -103,4 +110,3 @@ test("useLogin", async () => {
   //assert the expected result
   expect(resultArray).toMatchObject(expectedOutcome);
 }, 30000);
-

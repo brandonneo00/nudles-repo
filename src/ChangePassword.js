@@ -114,7 +114,7 @@ function ChangePassword() {
                           "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
                       }}
                     >
-                      Change Password
+                      Send
                     </Box>
                   </div>
                 </VStack>

@@ -177,7 +177,18 @@ function ModulesDisplay() {
                 {disable ? "Edit Modules" : "Done Editing"}
               </Box>
               
-              <DisplayBox likedArray={likedArray} handleDelete={handleDelete} disable={disable} />
+              <SimpleGrid columns={4} spacing="3vw">
+                {likedArray.map((obj, index) => (
+                  <DisplayBox
+                    likedArray={likedArray}
+                    disable={disable}
+                    handleDelete={handleDelete}
+                    obj={obj}
+                    key={index}
+                    data-testid="module-grid"
+                  />
+                ))}
+              </SimpleGrid>
             </>
           ) : (
             <Box textAlign="left">

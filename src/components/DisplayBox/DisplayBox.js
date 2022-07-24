@@ -47,7 +47,7 @@ import {
                   boxShadow:
                     "0 0 1px 2px rgba(88, 144, 255, .75), 0 1px 1px rgba(0, 0, 0, .15)",
                 }}
- 
+                opacity="0.9"
               >
                 <Text
                   fontSize="1.042vw"

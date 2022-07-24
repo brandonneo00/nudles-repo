@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600");
 
-.background3 {
+
+
+/* .background3 {
   background-color: #fff;
   background-image: linear-gradient(
       90deg,
@@ -34,4 +36,12 @@
   align-items: center;
   z-index: 2;
   box-shadow: 4px 5px 5px 1px rgba(0, 0, 0, 0.24);
+} */
+
+.playdiv{ 
+  /* background-image: url("./images/search-background.png"); */
+  /* background-image: url("./images/background1.jpeg"); */
+  background-image: url("./images/background-play.PNG");
+  height: 100vh;
+  background-size: 100vw;
 }

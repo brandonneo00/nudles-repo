@@ -1007,7 +1007,7 @@ function Play(props) {
   };
 
   return (
-    <div className="background6">
+    <div className="playdiv">
       <TopBarV2 />
       {!clickBefore ? (
         //////////////////////////////if never click before/////////////////////////
@@ -1051,6 +1051,7 @@ function Play(props) {
               borderRadius="15px"
               margin="2% 2% 1%"
               padding="1.5%"
+              opacity="0.9"
             >
               <Box marginBottom="1vw">
                 <HStack>
@@ -1128,6 +1129,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1159,6 +1161,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1190,6 +1193,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1221,6 +1225,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1252,6 +1257,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1283,6 +1289,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1356,6 +1363,7 @@ function Play(props) {
               borderRadius="15px"
               margin="2% 2% 1%"
               padding="1.5%"
+              opacity="0.9"
             >
               <Box marginBottom="1vw">
                 <HStack>
@@ -1433,6 +1441,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1464,6 +1473,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1495,6 +1505,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1526,6 +1537,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1557,6 +1569,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
@@ -1588,6 +1601,7 @@ function Play(props) {
                   padding="0% 1.5%"
                   width="26.042vw"
                   height="3.646vw"
+                  opacity="0.9"
                 >
                   <Center>
                     <HStack spacing={0}>
